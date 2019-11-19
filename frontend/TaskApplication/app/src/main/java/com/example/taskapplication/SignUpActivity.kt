@@ -21,7 +21,9 @@ class SignUpActivity : AppCompatActivity() {
             val email = etEmail.text
 
             // code to resolve sign up
-            // afterwards redirect user to some other activity
+            // afterwards redirect user to useractivity if successful
+            val intent = Intent(this, UserActivity::class.java)
+            startActivity(intent)
         }
     }
 }
