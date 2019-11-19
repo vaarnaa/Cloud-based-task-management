@@ -21,6 +21,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
         buttonLogin.setOnClickListener(this)
         buttonSignUp.setOnClickListener(this)
+        buttonLogout.setOnClickListener(this)
 
         // Initialize Firebase Auth.
         auth = FirebaseAuth.getInstance()
