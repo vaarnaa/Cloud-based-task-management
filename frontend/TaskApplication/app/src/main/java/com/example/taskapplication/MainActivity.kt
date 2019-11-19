@@ -1,15 +1,16 @@
 package com.example.taskapplication
 
-
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.app.Activity
 import android.content.Intent
-import android.provider.AlarmClock.EXTRA_MESSAGE
-
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : Activity() {
+    // Declare an instance of Firebase Auth
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,6 +33,16 @@ class MainActivity : Activity() {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
+
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance()
+    }
+
+    public override fun onStart() {
+        super.onStart()
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth.currentUser
+        // TODO: updateUI(currentUser)
     }
 }
 
