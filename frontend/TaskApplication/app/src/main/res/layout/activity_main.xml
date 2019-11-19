@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -16,7 +12,7 @@
         android:layout_height="50dp"
         android:gravity="center_horizontal"
         android:textSize="30sp"
-        android:text="Login">
+        android:text="@string/login">
     </TextView>
 
     <EditText
@@ -25,7 +21,7 @@
         android:layout_height="50dp"
         android:padding="1dp"
         android:inputType="textPersonName"
-        android:hint="Username" />
+        android:hint="@string/username" />
 
     <EditText
         android:id="@+id/et_password"
@@ -33,11 +29,12 @@
         android:layout_height="50dp"
         android:padding="5dp"
         android:inputType="textPassword"
-        android:hint="Password" />
+        android:hint="@string/password" />
 
     <LinearLayout
+        android:id="@+id/loginButtons"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_margin="30dp">
 
@@ -45,16 +42,16 @@
             android:id="@+id/buttonLogin"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Login">
+            android:text="@string/login">
         </Button>
 
         <Button
             android:id="@+id/buttonSignUp"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="Not a member yet?\n Sign up here">
+            android:text="@string/not_a_member_yet_sign_up_here">
         </Button>
-    </LinearLayout>
 
+    </LinearLayout>
 
 </LinearLayout>

@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Task Application</string>
+    <string name="loading">Loading…</string>
+    <string name="login">Login</string>
+    <string name="not_a_member_yet_sign_up_here">Not a member yet? Sign up here</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
 </resources>
