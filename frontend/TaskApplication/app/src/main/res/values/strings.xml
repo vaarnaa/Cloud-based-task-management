@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Task Application</string>
+    <string name="title_activity_projects">Projects</string>
+    <string name="title_create_project">Create project</string>
 </resources>
