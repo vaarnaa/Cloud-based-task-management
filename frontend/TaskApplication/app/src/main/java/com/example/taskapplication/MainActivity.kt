@@ -98,7 +98,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
             }
     }
 
-    private fun logout() {
+    private fun signOut() {
         auth.signOut()
         updateUI(null)
     }
@@ -144,7 +144,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         when (v.id) {
             R.id.buttonSignUp -> createAccount(et_email.text.toString(), et_password.text.toString())
             R.id.buttonLogin -> signIn(et_email.text.toString(), et_password.text.toString())
-            R.id.buttonLogout -> logout()
+            R.id.buttonLogout -> signOut()
         }
     }
 
