@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "955102176183",
+    "firebase_url": "https://mcc-fall-2019-g09.firebaseio.com",
+    "project_id": "mcc-fall-2019-g09",
+    "storage_bucket": "mcc-fall-2019-g09.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955102176183:android:86509e37c335dd88e6fe32",
+        "android_client_info": {
+          "package_name": "com.example.taskapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "955102176183-lrvldju9nbf41mpe38jpsdo8h92h5ua5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.taskapplication",
+            "certificate_hash": "3d5db9a228bb8b0c646579baa2d0e2df401aab29"
+          }
+        },
+        {
+          "client_id": "955102176183-6oiqsfo6kkhj3mcntne266ogivrjredk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSVpKwzPpSIjA0djcs6bSVrqv8nsWaUGk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "955102176183-6oiqsfo6kkhj3mcntne266ogivrjredk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

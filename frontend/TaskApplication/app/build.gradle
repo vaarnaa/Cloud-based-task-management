@@ -1,7 +1,5 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
 
 android {
@@ -32,4 +30,13 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+
+    // Add the SDKs for Firebase products
+    implementation 'com.google.firebase:firebase-auth:19.1.0' // Firebase Authentication
+
+    // Getting a "Could not find" error? Make sure that you've added
+    // Google's Maven repository to your root-level build.gradle file
 }
+
+// IMPORTANT: Keep this line at the end of this file to prevent dependency collisions!
+apply plugin: 'com.google.gms.google-services' // Google Play services Gradle plugin
