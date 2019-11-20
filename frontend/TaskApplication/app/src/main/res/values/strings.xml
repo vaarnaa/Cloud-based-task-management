@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Task Application</string>
     <string name="loading">Loading…</string>
+    <string name="main_page">Main page</string>
+    <string name="signup_page">Sign up</string>
     <string name="login">Login</string>
     <string name="logout">Logout</string>
     <string name="not_a_member_yet_sign_up_here">Not a member yet? Sign up here</string>
@@ -17,4 +19,6 @@
     <string name="firebase_user_management">Firebase User Management</string>
     <string name="title_activity_projects">Projects</string>
     <string name="title_create_project">Create project</string>
+    <string name="username">Username</string>
+    <string name="submit">Submit</string>
 </resources>

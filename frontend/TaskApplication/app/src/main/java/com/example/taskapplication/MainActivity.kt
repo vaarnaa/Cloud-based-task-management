@@ -1,5 +1,6 @@
 package com.example.taskapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -16,62 +17,27 @@ class MainActivity : BaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         // These call findViewById on the first time, and then cache the values
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
         buttonLogin.setOnClickListener(this)
-        buttonSignUp.setOnClickListener(this)
-        buttonLogout.setOnClickListener(this)
-
+        buttonSignup.setOnClickListener(this)
+        buttonLogout.setOnClickListener(this) // TODO: Move this to UserActivity.
         // Initialize Firebase Auth.
         auth = FirebaseAuth.getInstance()
-
-        /*val buttonLogin = findViewById<Button>(R.id.buttonLogin) as Button
-        val buttonSignUp = findViewById<Button>(R.id.buttonSignUp) as Button
-        val etUsername = findViewById<EditText>(R.id.et_username) as EditText
-        val etPassword = findViewById<EditText>(R.id.et_password) as EditText
-        buttonLogin.setOnClickListener {
-            val username = etUsername.text
-            val password = etPassword.text
-            // code to resolve login
-            // afterwards redirect user to some other activity
-        }
-        buttonSignUp.setOnClickListener {
-            // redirect user to sign up activity
-            val intent = Intent(this, SignUpActivity::class.java)
-            startActivity(intent)
-        }*/
     }
 
     public override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
+        // TODO: Redirect to UserActivity if signed in.
         val currentUser = auth.currentUser
         updateUI(currentUser)
     }
 
-    private fun createAccount(email: String, password: String) {
-        Log.d(TAG, "createAccount:$email")
-        if (!validateForm()) {
-            return
-        }
-        showProgressDialog()
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information.
-                    Log.d(TAG, "createUserWithEmail:success")
-                    val user = auth.currentUser
-                    updateUI(user)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
-                        Toast.LENGTH_SHORT).show()
-                    updateUI(null)
-                }
-                hideProgressDialog()
-            }
+    private fun signUp() {
+        // Redirect the user to the sign up activity.
+        val intent = Intent(this, SignUpActivity::class.java)
+        startActivity(intent)
     }
 
     private fun signIn(email: String, password: String) {
@@ -90,7 +56,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
-                    Toast.makeText(baseContext, "Authentication failed.",
+                    Toast.makeText(baseContext, "Logging in failed.",
                         Toast.LENGTH_SHORT).show()
                     updateUI(null)
                     status.setText(R.string.auth_failed)
@@ -99,6 +65,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
             }
     }
 
+    // TODO: Move this to UserActivity.
     private fun signOut() {
         auth.signOut()
         updateUI(null)
@@ -143,9 +110,9 @@ class MainActivity : BaseActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.buttonSignUp -> createAccount(et_email.text.toString(), et_password.text.toString())
             R.id.buttonLogin -> signIn(et_email.text.toString(), et_password.text.toString())
-            R.id.buttonLogout -> signOut()
+            R.id.buttonSignup -> signUp()
+            R.id.buttonLogout -> signOut() // TODO: Move this to UserActivity.
         }
     }
 
@@ -154,73 +121,3 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         private const val TAG = "MainActivity"
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-class MainActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }
-
-    // all views
-    var myButton = findViewById(R.id.my_button)
-    var etUsername: EditText = findViewById<EditText>(R.id.et_username) as EditText
-    var etPassword: EditText = findViewById<EditText>(R.id.et_password) as EditText
-    val buttonLogin : Button = findViewById<Button>(R.id.buttonLogin) as Button
-    val buttonSignUp: Button = findViewById<Button>(R.id.buttonSignUp) as Button
-
-    buttonLogin.setOnClickListener(object : View.OnClickListener{
-        override fun onClick(v: View?) {
-            //Your code here
-        }})
-
-    val clickListener = View.OnClickListener { view ->
-
-        when (view.getId()) {
-            R.id.buttonLogin -> resolveLogin()
-            R.id.buttonSignUp -> resolveSignUp()
-        }
-    }
-
-    fun resolveLogin() {
-        val username = et_username.text
-        val password = et_password.text
-
-        // code for resolving login
-        println("login")
-    }
-
-    fun resolveSignUp() {
-        // user directed to signUp view
-
-        println("signUp")
-    }
-    /*
-    // set on-click listener
-    buttonLogin.setOnClickListener {
-        val user_name = et_username.text;
-        val password = et_password.text;
-
-        // your code to validate the user_name and password combination
-        // and verify the same
-
-    }
-    */
-
-*/
-
-
-
-
