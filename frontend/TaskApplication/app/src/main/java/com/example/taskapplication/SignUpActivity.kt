@@ -84,7 +84,7 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
     }
 
     companion object {
-        // Used for debugging purposes.
+        // Used for printing debug messages. Usage: Log.d(TAG, "message")
         private const val TAG = "SignUpActivity"
     }
 }

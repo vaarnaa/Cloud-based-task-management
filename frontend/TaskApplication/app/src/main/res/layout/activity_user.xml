@@ -1,24 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_margin="20dp">
 
-    <Button
-        android:layout_marginTop="200dp"
-        android:id="@+id/buttonProjects"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="View projects">
-    </Button>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="30dp">
 
-    <Button
-        android:id="@+id/buttonSettings"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="40sp"
+            android:text="@string/user_page" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/signed_out" />
+
+        <TextView
+            android:id="@+id/detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Firebase User ID: 123456789abc" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/userButtons"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="Profile settings">
-    </Button>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="30dp">
+
+        <Button
+            android:id="@+id/buttonProjects"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="@string/view_projects" />
+
+        <Button
+            android:id="@+id/buttonSettings"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="@string/profile_settings" />
+
+        <Button
+            android:id="@+id/buttonLogout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="@string/logout" />
+
+    </LinearLayout>
 
 </LinearLayout>

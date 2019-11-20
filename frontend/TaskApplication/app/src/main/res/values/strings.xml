@@ -17,8 +17,12 @@
 
     <string name="firebase_status_fmt">Firebase User: %s</string>
     <string name="firebase_user_management">Firebase User Management</string>
+
     <string name="title_activity_projects">Projects</string>
     <string name="title_create_project">Create project</string>
     <string name="username">Username</string>
     <string name="submit">Submit</string>
+    <string name="user_page">User page</string>
+    <string name="view_projects">View projects</string>
+    <string name="profile_settings">Profile settings</string>
 </resources>

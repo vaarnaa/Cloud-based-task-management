@@ -21,7 +21,7 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
         buttonLogin.setOnClickListener(this)
         buttonSignup.setOnClickListener(this)
-        buttonLogout.setOnClickListener(this) // TODO: Move this to UserActivity.
+        // buttonLogout.setOnClickListener(this) // TODO: Move this to UserActivity.
         // Initialize Firebase Auth.
         auth = FirebaseAuth.getInstance()
     }
@@ -29,7 +29,6 @@ class MainActivity : BaseActivity(), View.OnClickListener {
     public override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
-        // TODO: Redirect to UserActivity if signed in.
         val currentUser = auth.currentUser
         updateUI(currentUser)
     }
@@ -66,10 +65,10 @@ class MainActivity : BaseActivity(), View.OnClickListener {
     }
 
     // TODO: Move this to UserActivity.
-    private fun signOut() {
+    /*private fun signOut() {
         auth.signOut()
         updateUI(null)
-    }
+    }*/
 
     private fun validateForm(): Boolean {
         var valid = true
@@ -93,13 +92,18 @@ class MainActivity : BaseActivity(), View.OnClickListener {
     private fun updateUI(user: FirebaseUser?) {
         hideProgressDialog()
         if (user != null) {
-            status.text = getString(R.string.emailpassword_status_fmt,
+            // The user is signed in, so redirect to user page.
+            val intent = Intent(this, UserActivity::class.java)
+            startActivity(intent)
+
+            /*status.text = getString(R.string.emailpassword_status_fmt,
                 user.email, user.isEmailVerified)
             detail.text = getString(R.string.firebase_status_fmt, user.uid)
             loginButtons.visibility = View.GONE
             loginFields.visibility = View.GONE
-            signedInButtons.visibility = View.VISIBLE
+            signedInButtons.visibility = View.VISIBLE*/
         } else {
+            // The user is signed out.
             status.setText(R.string.signed_out)
             detail.text = null
             loginButtons.visibility = View.VISIBLE
@@ -112,12 +116,12 @@ class MainActivity : BaseActivity(), View.OnClickListener {
         when (v.id) {
             R.id.buttonLogin -> signIn(et_email.text.toString(), et_password.text.toString())
             R.id.buttonSignup -> signUp()
-            R.id.buttonLogout -> signOut() // TODO: Move this to UserActivity.
+            // R.id.buttonLogout -> signOut() // TODO: Move this to UserActivity.
         }
     }
 
     companion object {
-        // Used for debugging purposes.
+        // Used for printing debug messages. Usage: Log.d(TAG, "message")
         private const val TAG = "MainActivity"
     }
 }
