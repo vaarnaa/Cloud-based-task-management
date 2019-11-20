@@ -34,7 +34,7 @@ dependencies {
 
     // Add the SDKs for Firebase products
     implementation 'com.google.firebase:firebase-auth:19.1.0' // Firebase Authentication
-
+    implementation 'com.google.firebase:firebase-database-ktx:19.2.0' // Firebase Realtime Database
     // Getting a "Could not find" error? Make sure that you've added
     // Google's Maven repository to your root-level build.gradle file
 }
