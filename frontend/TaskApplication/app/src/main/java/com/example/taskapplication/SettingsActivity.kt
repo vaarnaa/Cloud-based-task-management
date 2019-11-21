@@ -45,12 +45,18 @@ class SettingsActivity : BaseActivity(), View.OnClickListener {
             // The user is signed in.
             status.text = getString(R.string.emailpassword_status_fmt,
                 user.email, user.isEmailVerified)
-            detail.text = getString(R.string.firebase_status_fmt, user.uid)
+            userId.text = getString(R.string.firebase_status_fmt, user.uid)
+            displayName.text = getString(R.string.firebase_display_name_fmt,
+                user.displayName)
+            profilePhotoUrl.text = getString(R.string.firebase_profile_photo_fmt,
+                user.photoUrl)
             profileButtons.visibility = View.VISIBLE
         } else {
             // The user is signed out, so redirect to the login page.
             status.setText(R.string.signed_out)
-            detail.text = null
+            userId.text = null
+            displayName.text = null
+            profilePhotoUrl.text = null
             profileButtons.visibility = View.GONE
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)

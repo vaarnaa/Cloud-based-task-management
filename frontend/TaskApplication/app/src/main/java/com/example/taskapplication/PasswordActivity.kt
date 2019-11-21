@@ -31,7 +31,7 @@ class PasswordActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun changePassword() {
-        val user = FirebaseAuth.getInstance().currentUser
+        val user = auth.currentUser
         val newPassword = et_password.text.toString()
         if (!validatePasswords()) {
             return

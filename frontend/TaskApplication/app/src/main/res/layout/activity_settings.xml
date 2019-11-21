@@ -13,7 +13,7 @@
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginBottom="30dp">
+        android:layout_marginBottom="10dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -27,11 +27,33 @@
             android:layout_height="wrap_content"
             android:text="@string/signed_out" />
 
-        <TextView
-            android:id="@+id/detail"
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="start"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="30dp">
+
+    <TextView
+            android:id="@+id/userId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="Firebase User ID: 123456789abc" />
+
+        <TextView
+            android:id="@+id/displayName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Display name: userName" />
+
+        <TextView
+            android:id="@+id/profilePhotoUrl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Profile photo URL: http://url.com" />
 
     </LinearLayout>
 

@@ -1,10 +1,13 @@
 package com.example.taskapplication
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.android.synthetic.main.activity_profile_image.*
 
 class ProfileImageActivity : BaseActivity(), View.OnClickListener {
@@ -28,9 +31,21 @@ class ProfileImageActivity : BaseActivity(), View.OnClickListener {
         updateUI(currentUser)
     }
 
-    private fun changeProfileImage() { // TODO:
-        // val intent = Intent(this, SettingsActivity::class.java)
-        // startActivity(intent)
+    private fun changeProfileImage() {
+        // Update the profile image of the user.
+        val user = auth.currentUser
+        val profileUpdates = UserProfileChangeRequest.Builder()
+            .setPhotoUri(Uri.parse(et_image_url.text.toString()))
+            .build()
+        user?.updateProfile(profileUpdates)
+            ?.addOnCompleteListener { t ->
+                if (t.isSuccessful) {
+                    Log.d(TAG, "User profile image updated.")
+                    // Redirect back to the profile settings page if updated successfully.
+                    val intent = Intent(this, SettingsActivity::class.java)
+                    startActivity(intent)
+                }
+            }
     }
 
     private fun updateUI(user: FirebaseUser?) {
