@@ -55,6 +55,14 @@
             android:inputType="textPassword"
             android:hint="@string/password" />
 
+        <EditText
+            android:id="@+id/et_prof_img"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:inputType="textUri"
+            android:hint="@string/profile_image_url" />
+
     </LinearLayout>
 
     <LinearLayout

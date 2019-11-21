@@ -1,12 +1,14 @@
 package com.example.taskapplication
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
 import kotlinx.android.synthetic.main.activity_signup.*
 
 class SignUpActivity : BaseActivity(), View.OnClickListener {
@@ -35,9 +37,19 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
                 if (task.isSuccessful) {
                     // Sign in success.
                     Log.d(TAG, "createUserWithEmail:success")
+                    // Set the display name and profile image of the user.
                     val user = auth.currentUser
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(et_username.text.toString())
+                        .setPhotoUri(Uri.parse(et_prof_img.text.toString()))
+                        .build()
+                    user?.updateProfile(profileUpdates)
+                        ?.addOnCompleteListener { t ->
+                            if (t.isSuccessful) {
+                                Log.d(TAG, "User profile updated.")
+                            }
+                        }
                     // Redirect the user to the user activity.
-                    // TODO: Save the username separately to Firebase storage.
                     val intent = Intent(this, UserActivity::class.java)
                     startActivity(intent)
                 } else {

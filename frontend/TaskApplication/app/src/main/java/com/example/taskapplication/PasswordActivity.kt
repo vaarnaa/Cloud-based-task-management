@@ -2,6 +2,8 @@ package com.example.taskapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -28,9 +30,48 @@ class PasswordActivity : BaseActivity(), View.OnClickListener {
         updateUI(currentUser)
     }
 
-    private fun changePassword() { // TODO:
-        // val intent = Intent(this, SettingsActivity::class.java)
-        // startActivity(intent)
+    private fun changePassword() {
+        val user = FirebaseAuth.getInstance().currentUser
+        val newPassword = et_password.text.toString()
+        if (!validatePasswords()) {
+            return
+        }
+        user?.updatePassword(newPassword)
+            ?.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d(TAG, "User password updated.")
+                    // Redirect back to the profile settings page if updated successfully.
+                    val intent = Intent(this, SettingsActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+    }
+
+    private fun validatePasswords(): Boolean {
+        var valid = true
+        val password = et_password.text.toString()
+        if (TextUtils.isEmpty(password)) {
+            et_password.error = "Required."
+            valid = false
+        } else {
+            et_password.error = null
+        }
+        val passwordConf = et_password_confirm.text.toString()
+        if (TextUtils.isEmpty(passwordConf)) {
+            et_password_confirm.error = "Required."
+            valid = false
+        } else {
+            et_password_confirm.error = null
+        }
+        if (password != passwordConf) {
+            et_password.error = "Both passwords must match!"
+            et_password_confirm.error = "Both passwords must match!"
+            valid = false
+        } else {
+            et_password.error = null
+            et_password_confirm.error = null
+        }
+        return valid
     }
 
     private fun updateUI(user: FirebaseUser?) {
