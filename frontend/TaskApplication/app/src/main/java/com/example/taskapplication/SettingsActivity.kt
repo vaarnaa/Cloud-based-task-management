@@ -5,20 +5,19 @@ import android.os.Bundle
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.android.synthetic.main.activity_user.*
+import kotlinx.android.synthetic.main.activity_settings.*
 
-class UserActivity : BaseActivity(), View.OnClickListener {
+class SettingsActivity : BaseActivity(), View.OnClickListener {
     // Declare an instance of Firebase Auth.
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user)
+        setContentView(R.layout.activity_settings)
         // These call findViewById on the first time, and then cache the values
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
-        buttonProjects.setOnClickListener(this)
-        buttonSettings.setOnClickListener(this)
-        buttonLogout.setOnClickListener(this)
+        buttonChangePassword.setOnClickListener(this)
+        buttonChangeProfImg.setOnClickListener(this)
         // Initialize Firebase Auth.
         auth = FirebaseAuth.getInstance()
     }
@@ -30,13 +29,13 @@ class UserActivity : BaseActivity(), View.OnClickListener {
         updateUI(currentUser)
     }
 
-    private fun showProjects() {
-        val intent = Intent(this, ProjectsActivity::class.java)
+    private fun changePassword() {
+        val intent = Intent(this, PasswordActivity::class.java)
         startActivity(intent)
     }
 
-    private fun showSettings() {
-        val intent = Intent(this, SettingsActivity::class.java)
+    private fun changeProfileImage() {
+        val intent = Intent(this, ProfileImageActivity::class.java)
         startActivity(intent)
     }
 
@@ -44,30 +43,29 @@ class UserActivity : BaseActivity(), View.OnClickListener {
         hideProgressDialog()
         if (user != null) {
             // The user is signed in.
-            userButtons.visibility = View.VISIBLE
+            status.text = getString(R.string.emailpassword_status_fmt,
+                user.email, user.isEmailVerified)
+            detail.text = getString(R.string.firebase_status_fmt, user.uid)
+            profileButtons.visibility = View.VISIBLE
         } else {
             // The user is signed out, so redirect to the login page.
-            userButtons.visibility = View.GONE
+            status.setText(R.string.signed_out)
+            detail.text = null
+            profileButtons.visibility = View.GONE
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }
 
-    private fun signOut() {
-        auth.signOut()
-        updateUI(null)
-    }
-
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.buttonProjects -> showProjects()
-            R.id.buttonSettings -> showSettings()
-            R.id.buttonLogout -> signOut()
+            R.id.buttonChangePassword -> changePassword()
+            R.id.buttonChangeProfImg -> changeProfileImage()
         }
     }
 
     companion object {
         // Used for printing debug messages. Usage: Log.d(TAG, "message")
-        private const val TAG = "UserActivity"
+        private const val TAG = "SettingsActivity"
     }
 }

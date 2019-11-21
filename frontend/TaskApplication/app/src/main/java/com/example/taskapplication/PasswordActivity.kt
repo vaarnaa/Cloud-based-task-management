@@ -5,20 +5,18 @@ import android.os.Bundle
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import kotlinx.android.synthetic.main.activity_user.*
+import kotlinx.android.synthetic.main.activity_password.*
 
-class UserActivity : BaseActivity(), View.OnClickListener {
+class PasswordActivity : BaseActivity(), View.OnClickListener {
     // Declare an instance of Firebase Auth.
     private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user)
+        setContentView(R.layout.activity_password)
         // These call findViewById on the first time, and then cache the values
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
-        buttonProjects.setOnClickListener(this)
-        buttonSettings.setOnClickListener(this)
-        buttonLogout.setOnClickListener(this)
+        buttonChangePasswordSubmit.setOnClickListener(this)
         // Initialize Firebase Auth.
         auth = FirebaseAuth.getInstance()
     }
@@ -30,44 +28,32 @@ class UserActivity : BaseActivity(), View.OnClickListener {
         updateUI(currentUser)
     }
 
-    private fun showProjects() {
-        val intent = Intent(this, ProjectsActivity::class.java)
-        startActivity(intent)
-    }
-
-    private fun showSettings() {
-        val intent = Intent(this, SettingsActivity::class.java)
-        startActivity(intent)
+    private fun changePassword() { // TODO:
+        // val intent = Intent(this, SettingsActivity::class.java)
+        // startActivity(intent)
     }
 
     private fun updateUI(user: FirebaseUser?) {
         hideProgressDialog()
         if (user != null) {
             // The user is signed in.
-            userButtons.visibility = View.VISIBLE
+            passwordButtons.visibility = View.VISIBLE
         } else {
             // The user is signed out, so redirect to the login page.
-            userButtons.visibility = View.GONE
+            passwordButtons.visibility = View.GONE
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }
 
-    private fun signOut() {
-        auth.signOut()
-        updateUI(null)
-    }
-
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.buttonProjects -> showProjects()
-            R.id.buttonSettings -> showSettings()
-            R.id.buttonLogout -> signOut()
+            R.id.buttonChangePasswordSubmit -> changePassword()
         }
     }
 
     companion object {
         // Used for printing debug messages. Usage: Log.d(TAG, "message")
-        private const val TAG = "UserActivity"
+        private const val TAG = "PasswordActivity"
     }
 }

@@ -18,6 +18,9 @@
             android:label="@string/title_activity_projects"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".UserActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".PasswordActivity" />
+        <activity android:name=".ProfileImageActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

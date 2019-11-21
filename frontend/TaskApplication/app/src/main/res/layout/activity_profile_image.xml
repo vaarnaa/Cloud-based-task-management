@@ -19,12 +19,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="40sp"
-            android:text="@string/signup_page" />
+            android:gravity="center_horizontal"
+            android:text="@string/profile_image" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/signupFields"
+        android:id="@+id/profileFields"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -32,40 +33,24 @@
         android:layout_marginBottom="30dp">
 
         <EditText
-            android:id="@+id/et_username"
+            android:id="@+id/et_image_url"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:padding="5dp"
-            android:inputType="textPersonName"
-            android:hint="@string/username" />
-
-        <EditText
-            android:id="@+id/et_email"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:padding="5dp"
-            android:inputType="textEmailAddress"
-            android:hint="@string/email" />
-
-        <EditText
-            android:id="@+id/et_password"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:padding="5dp"
-            android:inputType="textPassword"
-            android:hint="@string/password" />
+            android:inputType="textUri"
+            android:hint="@string/new_profile_image_url" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/signupButtons"
+        android:id="@+id/profileButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginHorizontal="30dp">
 
         <Button
-            android:id="@+id/buttonSignupSubmit"
+            android:id="@+id/buttonChangeProfImgSubmit"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="@string/submit" />

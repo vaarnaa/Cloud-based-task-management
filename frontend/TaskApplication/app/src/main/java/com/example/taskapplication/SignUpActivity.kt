@@ -19,7 +19,7 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
         setContentView(R.layout.activity_signup)
         // These call findViewById on the first time, and then cache the values
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
-        buttonSubmit.setOnClickListener(this)
+        buttonSignupSubmit.setOnClickListener(this)
         // Initialize Firebase Auth.
         auth = FirebaseAuth.getInstance()
     }
@@ -79,7 +79,7 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.buttonSubmit -> createAccount(et_email.text.toString(), et_password.text.toString())
+            R.id.buttonSignupSubmit -> createAccount(et_email.text.toString(), et_password.text.toString())
         }
     }
 

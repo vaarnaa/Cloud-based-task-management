@@ -24,5 +24,12 @@
     <string name="submit">Submit</string>
     <string name="user_page">User page</string>
     <string name="view_projects">View projects</string>
+    <string name="profile">Profile</string>
     <string name="profile_settings">Profile settings</string>
+    <string name="change_password">Change password</string>
+    <string name="change_profImg">Change profile image</string>
+    <string name="profile_image">Profile image</string>
+    <string name="new_profile_image_url">New profile image URL</string>
+    <string name="new_password">New password</string>
+    <string name="new_password_confirmation">Confirm new password</string>
 </resources>

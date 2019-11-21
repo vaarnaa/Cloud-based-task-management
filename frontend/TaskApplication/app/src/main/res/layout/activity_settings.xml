@@ -19,34 +19,40 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="40sp"
-            android:text="@string/user_page" />
+            android:text="@string/profile" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/signed_out" />
+
+        <TextView
+            android:id="@+id/detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Firebase User ID: 123456789abc" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/userButtons"
+        android:id="@+id/profileButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginHorizontal="30dp">
 
         <Button
-            android:id="@+id/buttonProjects"
+            android:id="@+id/buttonChangePassword"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="@string/view_projects" />
+            android:text="@string/change_password" />
 
         <Button
-            android:id="@+id/buttonSettings"
+            android:id="@+id/buttonChangeProfImg"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:text="@string/profile_settings" />
-
-        <Button
-            android:id="@+id/buttonLogout"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="@string/logout" />
+            android:text="@string/change_profImg" />
 
     </LinearLayout>
 
