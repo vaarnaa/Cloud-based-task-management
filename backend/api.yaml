@@ -111,6 +111,10 @@ paths:
             properties:
               id:
                 type: string
+        '422':
+          description: "Malformed input"
+          schema:
+            $ref: "#/definitions/error"
         default:
           $ref: "#/responses/defaultErrorResponse"
   /project/{projectId}:
@@ -168,6 +172,10 @@ paths:
           description: "Project not found"
           schema:
             $ref: "#/definitions/error"
+        '422':
+          description: "Malformed input"
+          schema:
+            $ref: "#/definitions/error"
         default:
           $ref: "#/responses/defaultErrorResponse"
   /project/{projectId}/task:
@@ -198,6 +206,10 @@ paths:
             $ref: "#/definitions/error"
         default:
           $ref: "#/responses/defaultErrorResponse"
+        '422':
+          description: "Malformed input"
+          schema:
+            $ref: "#/definitions/error"
   /task/{taskId}:
     parameters:
     - $ref: "#/parameters/taskId"
@@ -225,6 +237,10 @@ paths:
                 type: string
         '404':
           description: "Task not found"
+          schema:
+            $ref: "#/definitions/error"
+        '422':
+          description: "Malformed input"
           schema:
             $ref: "#/definitions/error"
         default:
@@ -260,6 +276,10 @@ paths:
                 $ref: "#/definitions/users"
         '404':
           description: "Task or project not found"
+          schema:
+            $ref: "#/definitions/error"
+        '422':
+          description: "Malformed input"
           schema:
             $ref: "#/definitions/error"
         default:
