@@ -1,10 +1,11 @@
 const firebase = require('firebase');
 const env = require('./env');
+const log = require('./log');
 
 if (firebase.apps.length === 0)
 {
     const app = firebase.initializeApp(env.firebase);
-    console.log(`[FIREBASE]\tinitialized, app: ${app.name}`);
+    log.info(`Firebase initialized, app: ${app.name}`);
 }
 
 module.exports = firebase;

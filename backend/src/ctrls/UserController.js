@@ -1,38 +1,38 @@
 const firebase = require('../db');
-// const ref = firebase.database().ref("/Users");
+const log = require('../log');
 
 const UserController = {
 
   getAll(req, res) {
-    console.log("UserController.getAll");
+    log.debug("UserController.getAll");
 
     const users = firebase.database().ref().child('users');
     res.status(200).json({ status: 'ok', data: users });
   },
 
   createUser(req, res) {
-    console.log("UserController.createUser");
+    log.debug("UserController.createUser");
 
     const newUserId = firebase.database().ref().child('users').push().key;
-    console.log(`new user id: ${newUserId}`);
+    log.debug(`new user id: ${newUserId}`);
 
     const updates = {};
     updates['/users/' + newUserId] = req.body;
-    console.log(`updating with: ${JSON.stringify(updates)}`);
+    log.debug(`updating with: ${JSON.stringify(updates)}`);
 
     firebase.database().ref().update(updates)
       .then(values => {
-        console.log('UserController.getAll: ok');
+        log.debug('UserController.getAll: ok');
         res.status(201).json({ status: 'ok', data: values });
       })
       .catch(() => {
-        console.log('UserController.getAll: error');
+        log.debug('UserController.getAll: error');
         res.status(500).json({ status: 'internal error' });
       });
   },
 
   // updateSingle(req, res) {
-  //   console.log("HTTP POST Request");
+  //   log.debug("HTTP POST Request");
   //   var userName = req.body.UserName;
   //   var name = req.body.Name;
   //   var age = req.body.Age;

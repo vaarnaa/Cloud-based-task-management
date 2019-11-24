@@ -1,5 +1,6 @@
 const env = require('./env');
 const express = require('express');
+const log = require('./log');
 
 const app = express();
 app.use(express.json()); // parse JSON payload into `req.body`
@@ -14,9 +15,9 @@ const firebase = require('./db');
 const ctrls = require('./ctrls');
 
 app.use((req, res, next) => {
-    console.log(`DEBUG -- req.body: ${JSON.stringify(req.body)}`);
-    console.log(`DEBUG -- req.query: ${JSON.stringify(req.query)}`);
-    console.log(`DEBUG -- req.params: ${JSON.stringify(req.params)}`);
+    log.debug(`req.body: ${JSON.stringify(req.body)}`);
+    log.debug(`req.query: ${JSON.stringify(req.query)}`);
+    log.debug(`req.params: ${JSON.stringify(req.params)}`);
     next();
 })
 
@@ -55,12 +56,12 @@ app.use(function (req, res, next)
 
 app.use(function (err, req, res, next)
 {
-  console.error(err.stack)
+  log.error(err.stack)
   res.status(500).send('ERROR 500: Something broke!')
 })
 
 app.listen(env.port, () => {
-  console.log(`[EXPRESS]\tListening on port ${env.port}`)
+  log.info(`Express listening on port ${env.port}`)
 });
 
 module.exports = app;
