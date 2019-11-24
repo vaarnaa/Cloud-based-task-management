@@ -48,7 +48,7 @@ definitions:
       id:
         type: "integer"
         format: "int32"
-  members:
+  members: # Wrap members array inside a members object since endpoints doesn't allow having an array itself as request body
     type: "object"
     required:
     - "members"
