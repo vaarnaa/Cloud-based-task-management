@@ -17,6 +17,7 @@ const ctrls = require('./ctrls');
 // Debug middleware
 if (env.debug) {
     app.use((req, res, next) => {
+        log.debug(`------------------`);
         log.debug(`-- req.url ${req.originalUrl}`);
         log.debug(`-- req.body: ${JSON.stringify(req.body)}`);
         log.debug(`-- req.query: ${JSON.stringify(req.query)}`);
@@ -41,27 +42,28 @@ app.get('/', (req, res) => {
     });
 });
 
-// app.post('/', (req, res) => {
-//   const { body } = req;
-//   res.status(200).json(body);
-// });
+// Project related
+app.get('/projects/', ctrls.ProjectController.getAll);
+app.post('/project/', ctrls.ProjectController.createProject);
+app.get('/project/:project_id', ctrls.ProjectController.getSingle);
+app.delete('/project/:project_id', ctrls.ProjectController.deleteProject);
 
-// app.get('/project', (req, res) => {
+// User/member related
+app.post('/project/:project_id/members', ctrls.ProjectController.attachUser);
 
-// });
+// Task related
+// app.get('/project/:project_id/tasks', ctrls.TaskController.getAllTasks);
+// app.post('/project/:project_id/task', ctrls.TaskController.createTask);
+// app.put('/project/:project_id/task/:task_id', ctrls.TaskController.updateTask);
 
-// app.delete('/project/:projectId', (req, res) => {
-//   console.log(req.params.projectId);
-// });
+// Attachment related
+app.get('/project/:project_id/attachments', ctrls.ProjectController.getAttachments);
+// app.post('/project/:project_id/attachment', ctrls.ProjectController.submitAttachment);
 
-// app.post('/project/:projectId/members', (req, res) => {
 
-// });
 
-app.get('/users/', ctrls.UserController.getAll);
-app.put('/users/', ctrls.UserController.createUser);
-// app.post('/users/', ctrls.UserController.asd2);
-// app.delete('/users/', ctrls.UserController.asd);
+
+// Generic
 
 app.use(function (req, res, next)
 {

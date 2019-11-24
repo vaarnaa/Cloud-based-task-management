@@ -11,7 +11,7 @@ const common = {
     // 4. Copy the contents below
     // firebase: {},
     firebase: {
-        apiKey: "AIzaSyAwshnihuiKH3-31zXcGlXNbsU8d6BJ3zI", // TODO: DO NOT COMMIT!
+        apiKey: "AIzaSyAwshnihuiKH3-31zXcGlXNbsU8d6BJ3zI",
         authDomain: "mcc-fall-2019-g09.firebaseapp.com",
         databaseURL: "https://mcc-fall-2019-g09.firebaseio.com",
         projectId: "mcc-fall-2019-g09",
