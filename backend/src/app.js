@@ -1,6 +1,7 @@
 const env = require('./env');
 const express = require('express');
 const log = require('./log');
+const base64url = require('base64url');
 
 const app = express();
 app.use(express.json()); // parse JSON payload into `req.body`
@@ -30,7 +31,8 @@ if (env.debug) {
 app.use((req, res, next) => {
   const encodedInfo = req.get('X-Endpoint-API-UserInfo');
   if (encodedInfo) {
-    req.body.auth_user = JSON.parse(new Buffer(encodedInfo, 'base64'));
+    const decodedInfo = base64url.decode(encodedInfo);
+    req.auth_user = JSON.parse(base64url.decode(encodedInfo));
   }
 
   next();

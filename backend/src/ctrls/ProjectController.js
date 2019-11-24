@@ -1,4 +1,5 @@
 const { database } = require('../db');
+const { projectBody } = require('../schemas');
 const log = require('../log');
 
 const ref_root = '/projects'
@@ -44,12 +45,17 @@ const ProjectController = {
   createProject(req, res) {
     log.debug("ProjectController.createProject");
 
+    const { error } = projectBody.validate(req.body);
+    if (error) {
+      return res.status(422).json({ code: 422, message: error });
+    }
+
     const newId = database.ref().child(ref_root).push().key;
     const updates = {};
     const newProject = {
       name: req.body.name,
       description: req.body.description,
-      admin: req.body.auth_user.id,
+      admin: req.auth_user.id,
       created: new Date(),
       deadline: new Date(req.body.deadline),
       badge: '', // url to image

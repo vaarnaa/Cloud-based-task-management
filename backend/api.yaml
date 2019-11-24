@@ -3,64 +3,295 @@ info:
   title: "Task management api"
   version: "0.0.1"
 schemes:
-  - "https"
+- "https"
 host: "mcc-fall-2019-g09.appspot.com"
-basePath: "/"
 consumes:
-  - application/json
+- application/json
 produces:
-  - application/json
+- application/json
+
+parameters:
+  projectId:
+    name: "projectId"
+    in: "path"
+    required: true
+    type: "string"
+  taskId:
+    name: "taskId"
+    in: "path"
+    required: true
+    type: "string"
+
+responses:
+  defaultErrorResponse:
+    description: "Error response"
+    schema:
+      $ref: "#/definitions/error"
 
 definitions:
-  member:
+  error:
     type: "object"
+    required:
+    - "code"
+    - "message"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+  user:
+    type: "object"
+    required:
+    - "id"
     properties:
       id:
         type: "integer"
         format: "int32"
-  members:
-    type: "array"
-    minItems: "1" # "(it can contain one or more users)" ???
-    items:
-      $ref: '#/definitions/member'
+  members: # Wrap members array inside a members object since endpoints doesn't allow having an array itself as request body
+    type: "object"
+    required:
+    - "members"
+    properties:
+      members:
+        type: "array" # "(it can contain one or more users)" ???
+        minItems: 1
+        items:
+          $ref: "#/definitions/user"
   taskAttributes:
     type: "object"
+    required:
+    - description
+    - status
+    - deadline
     properties:
       description:
         type: "string"
       status:
-        $ref: '#/definitions/taskStatus'
-      #deadline:
-      #  type: ""
+        $ref: "#/definitions/taskStatus"
+      deadline:
+        type: "string"
+        format: "date-time"
   taskStatus:
     type: "string"
-    enum: ["pending", "on-going", "completed"]
+    enum:
+    - "pending"
+    - "on-going"
+    - "completed"
+  users:
+    type: "object"
+    required:
+    - users
+    properties:
+      users:
+        type: "array"
+        items:
+          $ref: "#/definitions/user"
+  project:
+    type: "object"
 
 paths:
   /project:
     post:
       operationId: "createProject"
-      description: "Create a project"
+      description: "Creates a project"
+      parameters:
+      - name: "project"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/project"
       responses:
-        200:
-          description: "Project id"
+        '201':
+          description: "Project created"
           schema:
-            type: "integer"
-            format: "int32"
-  #/project/{projectId}:
-  #  delete:
-  #    operationId: "deleteProject"
-  #    description: "Delete a project"
-  #/project/{projectId}/members:
-  #  post:
-  #    operationId: "addProjectMembers"
-  #    description: "Add members to a project"
-  #/project/{projectId}/task:
-  #  post:
-  #    operationId: "createProjectTask"
-  #    description: "Create a task"
-  #/project/{projectId}/task/{taskId}/:
-  #/task:
-  #  post:
-  #    operationId: "createTask"
-  #    description: "Create a task"
+            type: "object"
+            required:
+            - "id"
+            properties:
+              id:
+                type: string
+        '422':
+          description: "Malformed input"
+          schema:
+            $ref: "#/definitions/error"
+        default:
+          $ref: "#/responses/defaultErrorResponse"
+  /project/{projectId}:
+    parameters:
+    - $ref: "#/parameters/projectId"
+    delete:
+      operationId: "deleteProject"
+      description: "Deletes a project"
+      responses:
+        '200':
+          description: "Project deleted"
+          schema:
+            type: "object"
+            required:
+            - "id"
+            properties:
+              id:
+                type: string
+        '404':
+          description: "Project not found"
+          schema:
+            $ref: "#/definitions/error"
+        '403':
+          description: "Insufficient permissions to delete project"
+          schema:
+            $ref: "#/definitions/error"
+        default:
+          $ref: "#/responses/defaultErrorResponse"
+  /project/{projectId}/members:
+    parameters:
+    - $ref: "#/parameters/projectId"
+    put:
+      operationId: "addProjectMembers"
+      description: "Add members to a project"
+      parameters:
+      - name: "members"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/members"
+      responses:
+        '200':
+          description: "Members added"
+          schema:
+            type: "object"
+            required:
+            - projectId
+            - members
+            properties:
+              projectId:
+                type: string
+              members:
+                $ref: "#/definitions/members"
+        '404':
+          description: "Project not found"
+          schema:
+            $ref: "#/definitions/error"
+        '422':
+          description: "Malformed input"
+          schema:
+            $ref: "#/definitions/error"
+        default:
+          $ref: "#/responses/defaultErrorResponse"
+  /project/{projectId}/task:
+    parameters:
+    - $ref: "#/parameters/projectId"
+    post:
+      operationId: "createProjectTask"
+      description: "Create a task for the project"
+      parameters:
+      - name: "task"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/taskAttributes"
+      responses:
+        '201':
+          description: "Task created"
+          schema:
+            type: "object"
+            required:
+            - "taskId"
+            properties:
+              taskId:
+                type: "string"
+        '404':
+          description: "Project not found"
+          schema:
+            $ref: "#/definitions/error"
+        default:
+          $ref: "#/responses/defaultErrorResponse"
+        '422':
+          description: "Malformed input"
+          schema:
+            $ref: "#/definitions/error"
+  /task/{taskId}:
+    parameters:
+    - $ref: "#/parameters/taskId"
+    put:
+      operationId: "updateTask"
+      description: "Updates task status"
+      parameters:
+      - name: "taskStatus"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/taskStatus"
+      responses:
+        '200':
+          description: "Task status updated"
+          schema:
+            type: "object"
+            required:
+            - taskStatus
+            - taskId
+            properties:
+              taskStatus:
+                $ref: "#/definitions/taskStatus"
+              taskId:
+                type: string
+        '404':
+          description: "Task not found"
+          schema:
+            $ref: "#/definitions/error"
+        '422':
+          description: "Malformed input"
+          schema:
+            $ref: "#/definitions/error"
+        default:
+          $ref: "#/responses/defaultErrorResponse"
+  /project/{projectId}/task/{taskId}:
+    parameters:
+    - $ref: "#/parameters/projectId"
+    - $ref: "#/parameters/taskId"
+    put:
+      operationId: "assignTask"
+      description: "Assign task to user(s)"
+      parameters:
+      - name: "users"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/users"
+      responses:
+        '200':
+          description: "Task assigned successfully"
+          schema:
+            type: "object"
+            required:
+            - "projectId"
+            - "taskId"
+            - "users"
+            properties:
+              projectId:
+                type: "string"
+              taskId:
+                type: "string"
+              users:
+                $ref: "#/definitions/users"
+        '404':
+          description: "Task or project not found"
+          schema:
+            $ref: "#/definitions/error"
+        '422':
+          description: "Malformed input"
+          schema:
+            $ref: "#/definitions/error"
+        default:
+          $ref: "#/responses/defaultErrorResponse"
+
+security:
+- firebase: []
+securityDefinitions:
+  firebase:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://securetoken.google.com/mcc-fall-2019-g09"
+    x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+    x-google-audiences: "mcc-fall-2019-g09"
