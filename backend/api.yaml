@@ -264,3 +264,14 @@ paths:
             $ref: "#/definitions/error"
         default:
           $ref: "#/responses/defaultErrorResponse"
+
+security:
+- firebase: []
+securityDefinitions:
+  firebase:
+    authorizationUrl: ""
+    flow: "implicit"
+    type: "oauth2"
+    x-google-issuer: "https://securetoken.google.com/mcc-fall-2019-g09"
+    x-google-jwks_uri: "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+    x-google-audiences: "mcc-fall-2019-g09"
