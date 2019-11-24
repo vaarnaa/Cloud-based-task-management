@@ -1,11 +1,12 @@
 const env = require('./env');
 const express = require('express');
+const log = require('./log');
 
 const app = express();
 app.use(express.json()); // parse JSON payload into `req.body`
 
 // Initialize Database
-const firebase = require('./db');
+const { admin } = require('./db');
 
 //
 // ROUTES + MIDDLEWARE SETUP
@@ -13,11 +14,26 @@ const firebase = require('./db');
 
 const ctrls = require('./ctrls');
 
+// Debug middleware
+if (env.debug) {
+    app.use((req, res, next) => {
+        log.debug(`------------------`);
+        log.debug(`-- req.url ${req.originalUrl}`);
+        log.debug(`-- req.body: ${JSON.stringify(req.body)}`);
+        log.debug(`-- req.query: ${JSON.stringify(req.query)}`);
+        log.debug(`-- req.params: ${JSON.stringify(req.params)}`);
+        return next();
+    })
+}
+
+// Parse EndPoints header for the authenticated user
 app.use((req, res, next) => {
-    console.log(`DEBUG -- req.body: ${JSON.stringify(req.body)}`);
-    console.log(`DEBUG -- req.query: ${JSON.stringify(req.query)}`);
-    console.log(`DEBUG -- req.params: ${JSON.stringify(req.params)}`);
-    next();
+  const encodedInfo = req.get('X-Endpoint-API-UserInfo');
+  if (encodedInfo) {
+    req.body.auth_user = JSON.parse(new Buffer(encodedInfo, 'base64'));
+  }
+
+  next();
 })
 
 app.get('/', (req, res) => {
@@ -26,27 +42,28 @@ app.get('/', (req, res) => {
     });
 });
 
-// app.post('/', (req, res) => {
-//   const { body } = req;
-//   res.status(200).json(body);
-// });
+// Project related
+app.get('/projects/', ctrls.ProjectController.getAll);
+app.post('/project/', ctrls.ProjectController.createProject);
+app.get('/project/:project_id', ctrls.ProjectController.getSingle);
+app.delete('/project/:project_id', ctrls.ProjectController.deleteProject);
 
-// app.get('/project', (req, res) => {
+// User/member related
+app.post('/project/:project_id/members', ctrls.ProjectController.attachUser);
 
-// });
+// Task related
+// app.get('/project/:project_id/tasks', ctrls.TaskController.getAllTasks);
+// app.post('/project/:project_id/task', ctrls.TaskController.createTask);
+// app.put('/project/:project_id/task/:task_id', ctrls.TaskController.updateTask);
 
-// app.delete('/project/:projectId', (req, res) => {
-//   console.log(req.params.projectId);
-// });
+// Attachment related
+app.get('/project/:project_id/attachments', ctrls.ProjectController.getAttachments);
+// app.post('/project/:project_id/attachment', ctrls.ProjectController.submitAttachment);
 
-// app.post('/project/:projectId/members', (req, res) => {
 
-// });
 
-app.get('/users/', ctrls.UserController.getAll);
-app.put('/users/', ctrls.UserController.createUser);
-// app.post('/users/', ctrls.UserController.asd2);
-// app.delete('/users/', ctrls.UserController.asd);
+
+// Generic
 
 app.use(function (req, res, next)
 {
@@ -55,12 +72,12 @@ app.use(function (req, res, next)
 
 app.use(function (err, req, res, next)
 {
-  console.error(err.stack)
+  log.error(err.stack)
   res.status(500).send('ERROR 500: Something broke!')
 })
 
 app.listen(env.port, () => {
-  console.log(`[EXPRESS]\tListening on port ${env.port}`)
+  log.info(`Express listening on port ${env.port}`)
 });
 
 module.exports = app;
