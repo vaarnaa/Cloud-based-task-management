@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json()); // parse JSON payload into `req.body`
 
 // Initialize Database
-const firebase = require('./db');
+const { admin } = require('./db');
 
 //
 // ROUTES + MIDDLEWARE SETUP
@@ -14,12 +14,38 @@ const firebase = require('./db');
 
 const ctrls = require('./ctrls');
 
+// Authentication middleware
 app.use((req, res, next) => {
-    log.debug(`req.body: ${JSON.stringify(req.body)}`);
-    log.debug(`req.query: ${JSON.stringify(req.query)}`);
-    log.debug(`req.params: ${JSON.stringify(req.params)}`);
-    next();
+
+    // `/signin` is the only URL that doesn't require authentication
+    if (req.originalUrl === '/signin')
+        return next();
+
+    if (req.headers.authorization) {
+        admin.auth()
+            .verifyIdToken(req.headers.authorization)
+            .then(asd => {
+                log.debug(`token verify ok: ${asd}`);
+                next()
+            }).catch(() => {
+                res.status(401).send('Unauthorized')
+            });
+    } else {
+        res.status(401).send('Unauthorized')
+    }
 })
+
+// Debug middleware
+
+if (env.debug) {
+    app.use((req, res, next) => {
+        log.debug(`-- req.url ${req.originalUrl}`);
+        log.debug(`-- req.body: ${JSON.stringify(req.body)}`);
+        log.debug(`-- req.query: ${JSON.stringify(req.query)}`);
+        log.debug(`-- req.params: ${JSON.stringify(req.params)}`);
+        return next();
+    })
+}
 
 app.get('/', (req, res) => {
   res.status(200).json({

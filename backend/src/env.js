@@ -9,24 +9,27 @@ const common = {
     // 2. General -> Your Apps -> select "mcc-backend-app" web app
     // 3. Firebase SDK config -> select "config"
     // 4. Copy the contents below
-    // firebase: {},
+    firebase: {},
     firebase: {
-        apiKey: "", // TODO: DO NOT COMMIT!
+        apiKey: "AIzaSyAwshnihuiKH3-31zXcGlXNbsU8d6BJ3zI", // TODO: DO NOT COMMIT!
         authDomain: "mcc-fall-2019-g09.firebaseapp.com",
         databaseURL: "https://mcc-fall-2019-g09.firebaseio.com",
         projectId: "mcc-fall-2019-g09",
         storageBucket: "mcc-fall-2019-g09.appspot.com",
         messagingSenderId: "955102176183",
         appId: "1:955102176183:web:63e19d224d44ed53e6fe32"
-    }
+    },
+    pathToServiceAccountKey: '../secrets/mcc-fall-2019-g09-firebase-adminsdk-q3qlb-14310e29b7.json'
 };
 
 const options = {
     development: {
-        ...common
+        ...common,
+        debug: true,
     },
     production: {
-        ...common
+        ...common,
+        debug: false,
     }
 };
 

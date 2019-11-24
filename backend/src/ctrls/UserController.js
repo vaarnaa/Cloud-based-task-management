@@ -1,7 +1,27 @@
-const firebase = require('../db');
+const { auth, database } = require('../db');
 const log = require('../log');
 
 const UserController = {
+
+  signIn(req, res) {
+    auth.signInWithEmailAndPassword(req.body.email, req.body.password)
+      .then(data => {
+        data.user.getIdToken()
+          .then(token => {
+            const response = { message: 'sign in ok', token };
+            log.debug(`auth: ${JSON.stringify(response)}`)
+            res.status(200).json(response);
+          })
+          .catch(err => {
+            log.error(`auth1: ${JSON.stringify(error)}`);
+            res.status(401).json({ message: 'nope'});
+          });
+      })
+      .catch(error => {
+        log.error(`auth2: ${JSON.stringify(error)}`);
+        res.status(401).json({ message: 'nope'});
+      });
+  },
 
   getAll(req, res) {
     log.debug("UserController.getAll");

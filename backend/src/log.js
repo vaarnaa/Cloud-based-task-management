@@ -1,3 +1,4 @@
+const env = require('./env');
 const colors = require('colors');
 
 colors.setTheme({
@@ -13,6 +14,10 @@ const logger = {
 
     log: (level, msg) => {
         const time = new Date().toJSON();
+
+        if (typeof msg === 'object' && msg !== null)
+            msg = JSON.stringify(msg);
+
         let final_msg = `[${time}] [${level}] ${msg}`;
 
         if (level == 'INFO')
@@ -27,10 +32,23 @@ const logger = {
         console.log(final_msg);
     },
 
-    info: (msg) => logger.log("INFO", msg),
-    debug: (msg) => logger.log("DEBUG", msg),
-    warn: (msg) => logger.log("ERROR", msg),
-    error: (msg) => logger.log("ERROR", msg),
+    info: (msg) => {
+        if (env.debug)
+            logger.log("INFO", msg)
+    },
+
+    debug: (msg) => {
+        if (env.debug)
+            logger.log("DEBUG", msg)
+    },
+
+    warn: (msg) => {
+        logger.log("ERROR", msg)
+    },
+
+    error: (msg) => {
+        logger.log("ERROR", msg)
+    },
 }
 
 module.exports = logger;
