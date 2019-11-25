@@ -1,5 +1,6 @@
 const env = require('./env');
 const express = require('express');
+require('express-async-errors')
 const log = require('./log');
 const base64url = require('base64url');
 
