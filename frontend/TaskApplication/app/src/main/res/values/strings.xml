@@ -43,5 +43,7 @@
     <string name="project_deadline_time">dd-mm-yyyy 00:00:00</string>
     <string name="set_project_deadline">set</string>
     <string name="project_keywords">Add keywords</string>
+    <string name="radio_personal">Personal</string>
+    <string name="radio_group">Group</string>
 
 </resources>
