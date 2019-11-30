@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_signup.*
+import kotlin.random.Random.Default.nextInt
 
 class SignUpActivity : BaseActivity(), View.OnClickListener {
     // Declare an instance of Firebase Auth.
@@ -32,10 +33,6 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
 
     private fun createAccount(email: String, password: String) {
         Log.d(TAG, "createAccount:$email")
-        if (!validateForm()) {
-            return
-        }
-        showProgressDialog()
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -62,7 +59,6 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
                     Toast.makeText(baseContext, "Signing up failed.",
                         Toast.LENGTH_SHORT).show()
                 }
-                hideProgressDialog()
             }
     }
 
@@ -73,13 +69,7 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
             et_username.error = "Required."
             valid = false
         } else {
-            val v = validateUsername(username)
-            if (v.isEmpty()) {
-                et_username.error = null
-            } else {
-                et_username.error = v
-                valid = false
-            }
+            et_username.error = null
         }
         val email = et_email.text.toString()
         if (TextUtils.isEmpty(email)) {
@@ -98,57 +88,121 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
         return valid
     }
 
-    private fun validateUsername(username: String): String {
-        // TODO: Check from Firebase Database.
-        val transactionSuccess = true
-        if (transactionSuccess) {
-            // Valid username, return an empty error string.
-            return ""
-        } else {
-            // TODO: Username has been taken, suggest three alternatives.
-            return "Username taken!"
-        }
+    private fun usernameTest(username: String) {
+        return
     }
 
-    private fun usernameTest(username: String) {
+    private fun validateUsername(username: String) {
+        if (!validateForm()) return
+        showProgressDialog()
+        val listener = object : ValueEventListener {
+            override fun onDataChange(dataSnapShot: DataSnapshot) {
+                Log.d(TAG, "validateUsername:onDataChange")
+                val user = dataSnapShot.getValue(String::class.java)
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                // The given username exists already.
+                Log.d(TAG, "validateUsername:onCancelled", databaseError.toException())
+                // ...
+            }
+        }
+        val d = database.child("usernames").child(username)
+        d.addValueEventListener(listener)
+        Log.d(TAG, "d: $d")
+        d.setValue("uid")
+            /*.addOnSuccessListener {
+                succeeded(username)
+                // createAccount(et_email.text.toString(), et_password.text.toString())
+            }
+            .addOnFailureListener {
+                failed()
+            }*/
+        // Log.d(TAG, "set the value")
+        hideProgressDialog()
+
+        // Checking the username for uniqueness.
+        /*Log.d(TAG, "CALLED validateUsername")
+        val validUN: Boolean = validateUsername(username)
+        Log.d(TAG, "RETURNED validateUsername")
+        if (!validUN) {
+            Toast.makeText(baseContext, "validateUsername FALSE",
+                Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(baseContext, "validateUsername TRUE",
+                Toast.LENGTH_SHORT).show()
+        }*/
+
+
+        // showProgressDialog()
+        // Save usernames into /usernames/<username>.
+        // var valid: Boolean? = null
+        /* val th = object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                Log.d(TAG, mutableData.toString())
+                if (mutableData.getValue(String::class.java) == null) {
+                    // The 'username' key does not exist, so it is available.
+                    // The value does not matter here.
+                    mutableData.value = "uid"
+                    return Transaction.success(mutableData)
+                }
+                // Username taken, abort the transaction.
+                return Transaction.abort()
+            }
+            override fun onComplete(
+                // null if no errors occurred, otherwise it contains a description of the error.
+                error: DatabaseError?,
+                // True if the transaction successfully completed,
+                // false if it was aborted or an error occurred.
+                committed: Boolean,
+                // The current data at the location or null if an error occurred.
+                currentData: DataSnapshot?
+            ) {
+                /*if (committed) {
+                    // Username was available and saved successfully.
+                    et_username.error = null
+                    Toast.makeText(baseContext, "Username saved successfully!",
+                        Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "SUCCESS data: $committed")
+                    // valid = true
+                } else {
+                    // Username was taken, so inform of failure.
+                    val arr = generateUsernames(username)
+                    var text = "Username unavailable.\nYou can try these:\n"
+                    for (v in arr) text += "$v\n"
+                    et_username.error = text
+                    Toast.makeText(baseContext, "Username unavailable.",
+                        Toast.LENGTH_SHORT).show()
+                    // valid = false
+                }
+                // hideProgressDialog()*/
+            }
+        }
         database.child("usernames").child(username)
-            .runTransaction(object : Transaction.Handler {
-                override fun doTransaction(mutableData: MutableData): Transaction.Result {
-                    Log.d(TAG, mutableData.toString())
-                    if (mutableData.getValue(String::class.java) == null) {
-                        // The 'username' key does not exist, so it is available.
-                        // The value does not matter here.
-                        mutableData.value = "asd"
-                        return Transaction.success(mutableData)
-                    }
-                    // Username taken, abort the transaction.
-                    return Transaction.abort()
-                }
-                override fun onComplete(
-                    databaseError: DatabaseError?,
-                    commited: Boolean,
-                    dataSnapshot: DataSnapshot?
-                ) {
-                    // Transaction completed.
-                    if (commited) {
-                        // Username saved.
-                        et_username.error = null
-                        Toast.makeText(baseContext, "Username saved successfully!",
-                            Toast.LENGTH_SHORT).show()
-                    } else {
-                        // The username was taken, so inform the user of failure.
-                        et_username.error = "Unavailable username."
-                        Toast.makeText(baseContext, "Unavailable username.",
-                            Toast.LENGTH_SHORT).show()
-                    }
-                }
-            })
+            .runTransaction(th)
+        return th
+        while (true) {
+            if (valid != null) return valid
+        } */
+    }
+
+    private fun generateUsernames(username: String): Array<String> {
+        val ns = Array(3) { nextInt(100, 200) }
+        val ss = arrayOf("", "", "")
+        for (i in ns.indices) ss[i] = "$username${ns[i]}"
+        return ss
+    }
+
+    private fun failed() {
+        Log.d(TAG, "FAILED")
+    }
+
+    private fun succeeded(username: String) {
+        Log.d(TAG, "SUCCEEDED: $username")
     }
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.buttonSignupSubmit -> createAccount(
-                et_email.text.toString(), et_password.text.toString())
+            R.id.buttonSignupSubmit -> validateUsername(et_username.text.toString())
             R.id.buttonUsernameTest -> usernameTest(et_username.text.toString())
         }
     }
