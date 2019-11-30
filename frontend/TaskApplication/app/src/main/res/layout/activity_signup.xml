@@ -78,6 +78,12 @@
             android:layout_height="60dp"
             android:text="@string/submit" />
 
+        <Button
+            android:id="@+id/buttonUsernameTest"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Test username" />
+
     </LinearLayout>
 
 </LinearLayout>

@@ -9,8 +9,7 @@ import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_signup.*
 
 class SignUpActivity : BaseActivity(), View.OnClickListener {
@@ -25,6 +24,7 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
         // These call findViewById on the first time, and then cache the values
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
         buttonSignupSubmit.setOnClickListener(this)
+        buttonUsernameTest.setOnClickListener(this)
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
@@ -110,10 +110,46 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun usernameTest(username: String) {
+        database.child("usernames").child(username)
+            .runTransaction(object : Transaction.Handler {
+                override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                    Log.d(TAG, mutableData.toString())
+                    if (mutableData.getValue(String::class.java) == null) {
+                        // The 'username' key does not exist, so it is available.
+                        // The value does not matter here.
+                        mutableData.value = "asd"
+                        return Transaction.success(mutableData)
+                    }
+                    // Username taken, abort the transaction.
+                    return Transaction.abort()
+                }
+                override fun onComplete(
+                    databaseError: DatabaseError?,
+                    commited: Boolean,
+                    dataSnapshot: DataSnapshot?
+                ) {
+                    // Transaction completed.
+                    if (commited) {
+                        // Username saved.
+                        et_username.error = null
+                        Toast.makeText(baseContext, "Username saved successfully!",
+                            Toast.LENGTH_SHORT).show()
+                    } else {
+                        // The username was taken, so inform the user of failure.
+                        et_username.error = "Unavailable username."
+                        Toast.makeText(baseContext, "Unavailable username.",
+                            Toast.LENGTH_SHORT).show()
+                    }
+                }
+            })
+    }
+
     override fun onClick(v: View) {
         when (v.id) {
             R.id.buttonSignupSubmit -> createAccount(
                 et_email.text.toString(), et_password.text.toString())
+            R.id.buttonUsernameTest -> usernameTest(et_username.text.toString())
         }
     }
 
