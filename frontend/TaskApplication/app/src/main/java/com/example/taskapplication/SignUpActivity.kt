@@ -25,19 +25,21 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
         // These call findViewById on the first time, and then cache the values
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
         buttonSignupSubmit.setOnClickListener(this)
-        buttonUsernameTest.setOnClickListener(this)
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
     }
 
-    private fun createAccount(email: String, password: String) {
+    private fun createAccount(username: String, email: String, password: String) {
+        showProgressDialog()
         Log.d(TAG, "createAccount:$email")
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     // Account creation success.
                     Log.d(TAG, "createUserWithEmail:success")
+                    // Register the display name in the Realtime Database.
+                    database.child("usernames").child(username).setValue("uid")
                     // Set the display name and profile image of the user.
                     val user = auth.currentUser
                     val profileUpdates = UserProfileChangeRequest.Builder()
@@ -59,6 +61,7 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
                     Toast.makeText(baseContext, "Signing up failed.",
                         Toast.LENGTH_SHORT).show()
                 }
+                hideProgressDialog()
             }
     }
 
@@ -88,101 +91,50 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
         return valid
     }
 
-    private fun usernameTest(username: String) {
-        return
-    }
-
     private fun validateUsername(username: String) {
         if (!validateForm()) return
         showProgressDialog()
+        // Create a listener to be able to read from the Firebase Database.
         val listener = object : ValueEventListener {
+            // Called (1) when this listener is attached for the first time, and
+            // (2) when the data is updated for the first time.
+            // Afterwards this listener is removed (here it makes no difference since
+            // we only use this for case (1)).
             override fun onDataChange(dataSnapShot: DataSnapshot) {
-                Log.d(TAG, "validateUsername:onDataChange")
-                val user = dataSnapShot.getValue(String::class.java)
-            }
-            override fun onCancelled(databaseError: DatabaseError) {
-                // The given username exists already.
-                Log.d(TAG, "validateUsername:onCancelled", databaseError.toException())
-                // ...
-            }
-        }
-        val d = database.child("usernames").child(username)
-        d.addValueEventListener(listener)
-        Log.d(TAG, "d: $d")
-        d.setValue("uid")
-            /*.addOnSuccessListener {
-                succeeded(username)
-                // createAccount(et_email.text.toString(), et_password.text.toString())
-            }
-            .addOnFailureListener {
-                failed()
-            }*/
-        // Log.d(TAG, "set the value")
-        hideProgressDialog()
-
-        // Checking the username for uniqueness.
-        /*Log.d(TAG, "CALLED validateUsername")
-        val validUN: Boolean = validateUsername(username)
-        Log.d(TAG, "RETURNED validateUsername")
-        if (!validUN) {
-            Toast.makeText(baseContext, "validateUsername FALSE",
-                Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(baseContext, "validateUsername TRUE",
-                Toast.LENGTH_SHORT).show()
-        }*/
-
-
-        // showProgressDialog()
-        // Save usernames into /usernames/<username>.
-        // var valid: Boolean? = null
-        /* val th = object : Transaction.Handler {
-            override fun doTransaction(mutableData: MutableData): Transaction.Result {
-                Log.d(TAG, mutableData.toString())
-                if (mutableData.getValue(String::class.java) == null) {
-                    // The 'username' key does not exist, so it is available.
-                    // The value does not matter here.
-                    mutableData.value = "uid"
-                    return Transaction.success(mutableData)
-                }
-                // Username taken, abort the transaction.
-                return Transaction.abort()
-            }
-            override fun onComplete(
-                // null if no errors occurred, otherwise it contains a description of the error.
-                error: DatabaseError?,
-                // True if the transaction successfully completed,
-                // false if it was aborted or an error occurred.
-                committed: Boolean,
-                // The current data at the location or null if an error occurred.
-                currentData: DataSnapshot?
-            ) {
-                /*if (committed) {
-                    // Username was available and saved successfully.
+                Log.d(TAG, "validateUsername:onDataChange " +
+                        "dataSnapShot: $dataSnapShot " + "exists: ${dataSnapShot.exists()}")
+                // `dataSnapShot.exists == false` means that no username exists in the database.
+                if (!dataSnapShot.exists()) {
+                    // Username is available.
+                    Log.d(TAG, "validateUsername:valid")
                     et_username.error = null
-                    Toast.makeText(baseContext, "Username saved successfully!",
-                        Toast.LENGTH_SHORT).show()
-                    Log.d(TAG, "SUCCESS data: $committed")
-                    // valid = true
+                    // Proceed to creating the Firebase Auth account.
+                    createAccount(
+                        et_username.text.toString(),
+                        et_email.text.toString(),
+                        et_password.text.toString())
                 } else {
-                    // Username was taken, so inform of failure.
+                    // Username is not available, suggest three alternatives.
+                    Log.d(TAG, "validateUsername:invalid")
                     val arr = generateUsernames(username)
                     var text = "Username unavailable.\nYou can try these:\n"
                     for (v in arr) text += "$v\n"
                     et_username.error = text
                     Toast.makeText(baseContext, "Username unavailable.",
                         Toast.LENGTH_SHORT).show()
-                    // valid = false
                 }
-                // hideProgressDialog()*/
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                // An error occurred (probably due to incorrect Firebase Database rules).
+                Log.d(TAG, "validateUsername:onCancelled: $databaseError")
+                Toast.makeText(baseContext, "Something went wrong...",
+                    Toast.LENGTH_SHORT).show()
             }
         }
+        // Attach the listener to the path of the desired username.
         database.child("usernames").child(username)
-            .runTransaction(th)
-        return th
-        while (true) {
-            if (valid != null) return valid
-        } */
+            .addListenerForSingleValueEvent(listener)
+        hideProgressDialog()
     }
 
     private fun generateUsernames(username: String): Array<String> {
@@ -192,18 +144,9 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
         return ss
     }
 
-    private fun failed() {
-        Log.d(TAG, "FAILED")
-    }
-
-    private fun succeeded(username: String) {
-        Log.d(TAG, "SUCCEEDED: $username")
-    }
-
     override fun onClick(v: View) {
         when (v.id) {
             R.id.buttonSignupSubmit -> validateUsername(et_username.text.toString())
-            R.id.buttonUsernameTest -> usernameTest(et_username.text.toString())
         }
     }
 
