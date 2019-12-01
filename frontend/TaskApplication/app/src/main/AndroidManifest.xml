@@ -24,6 +24,7 @@
         <activity android:name=".SettingsActivity" />
         <activity android:name=".PasswordActivity" />
         <activity android:name=".ProfileImageActivity" />
+        <activity android:name=".ImageQualityActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

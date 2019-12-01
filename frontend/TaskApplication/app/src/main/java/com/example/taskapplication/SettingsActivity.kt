@@ -18,6 +18,7 @@ class SettingsActivity : BaseActivity(), View.OnClickListener {
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
         buttonChangePassword.setOnClickListener(this)
         buttonChangeProfImg.setOnClickListener(this)
+        buttonChangeImgQ.setOnClickListener(this)
         // Initialize Firebase Auth.
         auth = FirebaseAuth.getInstance()
     }
@@ -39,6 +40,11 @@ class SettingsActivity : BaseActivity(), View.OnClickListener {
         startActivity(intent)
     }
 
+    private fun changeImageQuality() {
+        val intent = Intent(this, ImageQualityActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun updateUI(user: FirebaseUser?) {
         hideProgressDialog()
         if (user != null) {
@@ -50,6 +56,7 @@ class SettingsActivity : BaseActivity(), View.OnClickListener {
                 user.displayName)
             profilePhotoUrl.text = getString(R.string.firebase_profile_photo_fmt,
                 user.photoUrl)
+            imageQualitySetting.text = getString(R.string.image_quality_setting)
             profileButtons.visibility = View.VISIBLE
         } else {
             // The user is signed out, so redirect to the login page.
@@ -57,6 +64,7 @@ class SettingsActivity : BaseActivity(), View.OnClickListener {
             userId.text = null
             displayName.text = null
             profilePhotoUrl.text = null
+            imageQualitySetting.text = null
             profileButtons.visibility = View.GONE
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
@@ -67,6 +75,7 @@ class SettingsActivity : BaseActivity(), View.OnClickListener {
         when (v.id) {
             R.id.buttonChangePassword -> changePassword()
             R.id.buttonChangeProfImg -> changeProfileImage()
+            R.id.buttonChangeImgQ -> changeImageQuality()
         }
     }
 

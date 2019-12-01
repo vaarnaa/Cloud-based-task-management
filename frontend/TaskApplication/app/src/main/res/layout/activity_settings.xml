@@ -55,6 +55,12 @@
             android:layout_height="wrap_content"
             tools:text="Profile photo URL: http://url.com" />
 
+        <TextView
+            android:id="@+id/imageQualitySetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Image quality (upload/download): full" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -75,6 +81,12 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="@string/change_profImg" />
+
+        <Button
+            android:id="@+id/buttonChangeImgQ"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="@string/change_imgQ" />
 
     </LinearLayout>
 
