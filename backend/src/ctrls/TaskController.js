@@ -1,5 +1,6 @@
 const { database } = require('../db');
 const { taskAttributesBody } = require('../schemas');
+const { getProjectAdmin, getProjectMembers } = require('../refs');
 const log = require('../log');
 
 const TaskController = {
@@ -19,13 +20,14 @@ const TaskController = {
 
   },
 
+/*
   // Get list of tasks
   // GET /project/{id}/tasks
   getAllTasks(req, res) {
     // const projects = firebase.database().ref().child('projects');
     // res.status(200).json({ status: 'ok', data: projects });
   },
-
+*/
 };
 
 module.exports = TaskController;

@@ -1,11 +1,17 @@
 const { database } = require('../db');
-const { projectBody } = require('../schemas');
+const { projectBody, membersBody } = require('../schemas');
+const { getProjectAdmin, getProjectMembers } = require('../refs');
 const log = require('../log');
 
-const ref_root = '/projects'
+const ref_root = '/projects';
+
+const projectNotFoundResponse = () => ({
+  code: 404,
+  message: 'Project not found'
+});
 
 const ProjectController = {
-
+/*
   // Get a project
   // GET /projects/{id}
   getSingle(req, res) {
@@ -25,7 +31,8 @@ const ProjectController = {
         res.status(400).json({ msg });
       });
   },
-
+*/
+/*
   // Get all projects user has access to
   getAll(req, res) {
     log.debug("ProjectController.getAll");
@@ -39,10 +46,10 @@ const ProjectController = {
 
     });
   },
-
+*/
   // Create project
   // POST /project/{id}
-  createProject(req, res) {
+  async createProject(req, res) {
     log.debug("ProjectController.createProject");
 
     const { error } = projectBody.validate(req.body);
@@ -66,37 +73,33 @@ const ProjectController = {
     };
     updates[`${ref_root}/${newId}`] = newProject;
 
-    database.ref().update(updates)
-      .then(values => {
-        log.debug(`ProjectController.createProject: created: ${newId} with: ${JSON.stringify(updates)}`);
-        res.status(201).json({ project_id: newId });
-      })
-      .catch(err => {
-        log.error('ProjectController.createProject: error');
-        log.error(err);
-        res.status(500).json({ status: 'internal error' });
-      });
+    const values = await database.ref().update(updates);
+
+    log.debug(`ProjectController.createProject: created: ${newId} with: ${JSON.stringify(updates)}`);
+    res.status(201).json({ project_id: newId });
   },
 
   // Delete project
   // DELETE /project/{id}
-  deleteProject(req, res) {
+  async deleteProject(req, res) {
     log.debug("ProjectController.deleteProject");
 
-    // TODO: delete also other related data!
+    const admin = await getProjectAdmin(req.params.project_id);
 
-    const ref = database.ref(`${ref_root}/${req.params.project_id}`);
-    ref.remove()
-      .then(data => {
-        res.status(200).json(data);
-      })
-      .catch(err => {
-        const msg = `Failed: ${err.code}`;
-        log.error(msg);
-        res.status(400).json({ msg });
-      });
+    if (!admin) {
+      return res.status(404).json(projectNotFoundResponse());
+    }
+
+    if (req.auth_user.id != admin) {
+      return res.status(403).json({ code: 403, message: 'Forbidden operation'})
+    }
+
+    // TODO: delete also other related data!
+    const data = await database.ref(`${ref_root}/${req.params.project_id}`).remove();
+    res.status(200).json(data);
   },
 
+/*
   // Get list of attachments
   // GET /project/{id}/attachments
   getAttachments(req, res) {
@@ -116,25 +119,31 @@ const ProjectController = {
         res.status(400).json({ msg });
       });
   },
+  */
 
-  // Attach user to project
-  // POST /project/{id}/members
-  attachUser(req, res) {
-    log.debug("ProjectController.attachUser");
+  // Attach users to project
+  // PUT /project/{id}/members
+  async attachUsers(req, res) {
+    log.debug("ProjectController.attachUsers");
 
-    // TODO: ensure user is project's admin
+    const { error } = membersBody.validate(req.body);
+    if (error) {
+      return res.status(422).json({ code: 422, message: error });
+    }
 
-    const ref = database.ref(`${ref_root}/${req.params.project_id}/members`);
+    const admin = await getProjectAdmin(req.params.project_id);
+    const members = await getProjectMembers(req.params.project_id);
 
-    ref.set(req.body.members)
-      .then(data => {
-        res.status(200).json(data);
-      })
-      .catch(err => {
-        const msg = `Failed: ${err.code}`;
-        log.error(msg);
-        res.status(400).json({ msg });
-      });
+    if (!admin) {
+      return res.status(404).json(projectNotFoundResponse());
+    }
+
+    if (admin !== req.auth_user.id && !members.find(member => member === req.auth_user.id)) {
+      return res.status(403).json({ code: 403, message: 'Forbidden operation' });
+    }
+
+    const data = await database.ref(`${ref_root}/${req.params.project_id}/members`).set(req.body.members.map(member => member.id));
+    res.status(200).json(data);
   },
 };
 
