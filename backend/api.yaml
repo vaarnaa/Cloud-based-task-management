@@ -138,7 +138,7 @@ paths:
           schema:
             $ref: "#/definitions/error"
         '403':
-          description: "Insufficient permissions to delete project"
+          description: "Insufficient permissions"
           schema:
             $ref: "#/definitions/error"
         default:
@@ -170,6 +170,10 @@ paths:
                 $ref: "#/definitions/members"
         '404':
           description: "Project not found"
+          schema:
+            $ref: "#/definitions/error"
+        '403':
+          description: "Insufficient permissions"
           schema:
             $ref: "#/definitions/error"
         '422':

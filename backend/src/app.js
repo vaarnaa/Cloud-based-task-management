@@ -33,7 +33,8 @@ app.use((req, res, next) => {
   const encodedInfo = req.get('X-Endpoint-API-UserInfo');
   if (encodedInfo) {
     const decodedInfo = base64url.decode(encodedInfo);
-    req.auth_user = JSON.parse(base64url.decode(encodedInfo));
+    log.debug(`-- req.auth_user: ${decodedInfo}`);
+    req.auth_user = JSON.parse(decodedInfo);
   }
 
   next();
@@ -46,21 +47,21 @@ app.get('/', (req, res) => {
 });
 
 // Project related
-app.get('/projects/', ctrls.ProjectController.getAll);
+// app.get('/projects/', ctrls.ProjectController.getAll);
 app.post('/project/', ctrls.ProjectController.createProject);
-app.get('/project/:project_id', ctrls.ProjectController.getSingle);
+// app.get('/project/:project_id', ctrls.ProjectController.getSingle);
 app.delete('/project/:project_id', ctrls.ProjectController.deleteProject);
 
 // User/member related
-app.post('/project/:project_id/members', ctrls.ProjectController.attachUser);
+app.put('/project/:project_id/members', ctrls.ProjectController.attachUsers);
 
 // Task related
 // app.get('/project/:project_id/tasks', ctrls.TaskController.getAllTasks);
-// app.post('/project/:project_id/task', ctrls.TaskController.createTask);
+app.post('/project/:project_id/task', ctrls.TaskController.createTask);
 // app.put('/project/:project_id/task/:task_id', ctrls.TaskController.updateTask);
 
 // Attachment related
-app.get('/project/:project_id/attachments', ctrls.ProjectController.getAttachments);
+// app.get('/project/:project_id/attachments', ctrls.ProjectController.getAttachments);
 // app.post('/project/:project_id/attachment', ctrls.ProjectController.submitAttachment);
 
 
