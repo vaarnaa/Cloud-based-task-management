@@ -42,6 +42,8 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_project)
         setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
         buttonAddIcon.setOnClickListener(this)
         setDeadlineButton.setOnClickListener(this)
         textViewDeadline = findViewById(R.id.tv_project_deadline_time)
@@ -60,6 +62,10 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_save -> {
             saveProject()
+            true
+        }
+        android.R.id.home -> {
+            finish()
             true
         }
         else -> {
@@ -93,7 +99,7 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
             //
         }
 
-        var imageB64 = null
+        var imageB64:String? = null
 
         try {
             val stream = ByteArrayOutputStream()
@@ -101,7 +107,7 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             bitmap.recycle()
             val byteArray = stream.toByteArray()
-            val imageB64: String = Base64.getEncoder().encodeToString(byteArray)
+            imageB64 = Base64.getEncoder().encodeToString(byteArray)
         }  catch (e: Exception) {
             // Image not set
         }
