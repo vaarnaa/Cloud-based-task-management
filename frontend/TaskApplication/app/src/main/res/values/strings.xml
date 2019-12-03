@@ -48,9 +48,9 @@
     <string name="change_imgQ">Change image quality</string>
     <string name="image_quality">Image quality</string>
     <string-array name="image_quality_array">
-        <item>Full</item>
-        <item>High</item>
-        <item>Low</item>
+        <item>Full (original size)</item>
+        <item>High (1280x960 px)</item>
+        <item>Low (640x480 px)</item>
     </string-array>
 
 </resources>

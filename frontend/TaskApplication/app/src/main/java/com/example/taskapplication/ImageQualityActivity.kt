@@ -40,7 +40,8 @@ class ImageQualityActivity : BaseActivity(), View.OnClickListener {
         val userId = auth.currentUser!!.uid
         // Save to /users/<uid>/imageQuality in the database.
         val dbPath = database.child("users").child(userId).child("imageQuality")
-        val imgQuality = spinnerImgQ.selectedItem.toString().toLowerCase(Locale.ENGLISH)
+        val imgQuality = spinnerImgQ.selectedItem.toString()
+            .toLowerCase(Locale.ENGLISH).split(" ")[0]
         dbPath.setValue(imgQuality).addOnCompleteListener { t ->
             if (t.isSuccessful) {
                 Log.d(TAG, "Image quality setting updated.")
