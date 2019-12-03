@@ -12,13 +12,12 @@
     <string name="signed_out">Signed out</string>
     <string name="auth_failed">Authentication failed</string>
 
-    <string name="emailpassword_status_fmt">Email User: %1$s (verified: %2$b)</string>
     <string name="emailpassword_title_text">Email and Password</string>
-
-    <string name="firebase_status_fmt">Firebase User: %s</string>
-    <string name="firebase_display_name_fmt">Firebase Display Name: %s</string>
-    <string name="firebase_profile_photo_fmt">Firebase Profile Photo URL: %s</string>
-    <string name="image_quality_setting">Image quality (upload/download): %s</string>
+    <string name="emailpassword_status_fmt">Email User: %s</string>
+    <string name="firebase_status_fmt">Firebase user ID: %s</string>
+    <string name="firebase_display_name_fmt">Firebase display name: %s</string>
+    <string name="firebase_profile_photo_fmt">Firebase profile photo: %s</string>
+    <string name="image_quality_setting">Upload/download image quality: %s</string>
 
     <string name="title_activity_projects">Projects</string>
     <string name="title_create_project">Create project</string>

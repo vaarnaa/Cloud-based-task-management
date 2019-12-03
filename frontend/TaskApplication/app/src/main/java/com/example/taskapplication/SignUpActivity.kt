@@ -38,16 +38,20 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
                 if (task.isSuccessful) {
                     // Account creation success.
                     Log.d(TAG, "createUserWithEmail:success")
-                    // Register the display name in the Realtime Database.
-                    database.child("usernames").child(username).setValue("uid")
                     // Set the display name and profile image of the user.
-                    val user = auth.currentUser
+                    val user = auth.currentUser!!
+                    // Register the display name in the database.
+                    database.child("usernames").child(username).setValue(user.uid)
+                    // Register other user profile info in the database.
+                    val userProfilePath = database.child("users").child(user.uid)
+                    userProfilePath.child("username").setValue(username)
+                    userProfilePath.child("imageQuality").setValue("high")
                     val profileUpdates = UserProfileChangeRequest.Builder()
-                        .setDisplayName(et_username.text.toString())
+                        .setDisplayName(username)
                         .setPhotoUri(Uri.parse(et_prof_img.text.toString()))
                         .build()
-                    user?.updateProfile(profileUpdates)
-                        ?.addOnCompleteListener { t ->
+                    user.updateProfile(profileUpdates)
+                        .addOnCompleteListener { t ->
                             if (t.isSuccessful) {
                                 Log.d(TAG, "User profile updated.")
                             }

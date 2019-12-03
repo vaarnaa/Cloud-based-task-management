@@ -48,7 +48,7 @@
         android:layout_marginHorizontal="30dp">
 
         <Button
-            android:id="@+id/buttonChangeImageQuality"
+            android:id="@+id/buttonChangeImgQSubmit"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="@string/submit" />
