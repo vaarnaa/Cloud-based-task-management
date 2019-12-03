@@ -2,23 +2,31 @@ package com.example.taskapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_image_quality.*
+import kotlinx.android.synthetic.main.activity_settings.*
+import java.util.*
 
 class ImageQualityActivity : BaseActivity(), View.OnClickListener {
     // Declare an instance of Firebase Auth.
     private lateinit var auth: FirebaseAuth
+    // Declare an instance of Firebase Realtime Database.
+    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image_quality)
         // These call findViewById on the first time, and then cache the values
         // for faster access in subsequent calls. Clicks are handled in `onClick`.
-        buttonChangeImageQuality.setOnClickListener(this)
-        // Initialize Firebase Auth.
+        buttonChangeImgQSubmit.setOnClickListener(this)
+        // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
     }
 
     public override fun onStart() {
@@ -29,8 +37,18 @@ class ImageQualityActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun changeImageQuality() {
-        val user = auth.currentUser
-        // TODO: Save to /users/<uid>/imageQuality in database.
+        val userId = auth.currentUser!!.uid
+        // Save to /users/<uid>/imageQuality in the database.
+        val dbPath = database.child("users").child(userId).child("imageQuality")
+        val imgQuality = spinnerImgQ.selectedItem.toString().toLowerCase(Locale.ENGLISH)
+        dbPath.setValue(imgQuality).addOnCompleteListener { t ->
+            if (t.isSuccessful) {
+                Log.d(TAG, "Image quality setting updated.")
+                // Redirect back to the profile settings page if updated successfully.
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+            }
+        }
     }
 
     private fun updateUI(user: FirebaseUser?) {
@@ -48,7 +66,7 @@ class ImageQualityActivity : BaseActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.buttonChangeImgQ -> changeImageQuality()
+            R.id.buttonChangeImgQSubmit -> changeImageQuality()
         }
     }
 

@@ -59,7 +59,7 @@
             android:id="@+id/imageQualitySetting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="Image quality (upload/download): full" />
+            tools:text="Upload/download image quality: full" />
 
     </LinearLayout>
 
