@@ -38,6 +38,7 @@
     <string name="project_description">Description</string>
     <string name="project_name">Name</string>
     <string name="create_project">create project</string>
+    <string name="create_task">create task</string>
     <string name="add_icon">Add icon</string>
     <string name="project_deadline">Deadline</string>
     <string name="project_deadline_time">dd-mm-yyyy 00:00:00</string>
