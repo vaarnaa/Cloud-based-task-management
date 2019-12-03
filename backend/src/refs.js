@@ -17,4 +17,5 @@ module.exports = {
   resolveRef,
   getProjectMembers,
   getProjectAdmin,
+  PROJECT_ROOT,
 }

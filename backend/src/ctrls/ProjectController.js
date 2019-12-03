@@ -1,9 +1,9 @@
 const { database } = require('../db');
 const { projectBody, membersBody } = require('../schemas');
-const { getProjectAdmin, getProjectMembers } = require('../refs');
+const { getProjectAdmin, getProjectMembers, PROJECT_ROOT } = require('../refs');
 const log = require('../log');
 
-const ref_root = '/projects';
+const ref_root = PROJECT_ROOT;
 
 const projectNotFoundResponse = () => ({
   code: 404,
