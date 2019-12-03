@@ -79,7 +79,9 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
         val name = editTextName.text.toString()
         val description = editTextDescription.text.toString()
         if (name.isEmpty() || description.isEmpty()) {
-            Toast.makeText(this, "Name and description can't be empty!", Toast.LENGTH_LONG).show()
+            Toast.makeText(this,
+                "Name and description can't be empty!",
+                Toast.LENGTH_LONG).show()
             return
         }
         val currentDate = LocalDateTime.now()
@@ -90,7 +92,9 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
         try {
             val input = editTextName.text.toString()
             if (!input.matches(("^[a-zA-Z0-9]+$").toRegex())) { // It's not working...
-                Toast.makeText(this, "Only alphanumeric characters allowed in keywords. Use space as delimiter.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this,
+                    "Only alphanumeric characters allowed in keywords. Use space as delimiter.",
+                    Toast.LENGTH_LONG).show()
                 return
             }
             keywords = input.split(" ", limit = 3)
@@ -119,13 +123,14 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
         val radioButton = findViewById<View>(selectedRadioId) as RadioButton
         val projectType = radioButton.text
 
-        // Save name, description, date, project type and possible keywords and image to firebase?
+        // TODO: Create a project with our API which returns the new project ID.
+        // TODO: POST https://mcc-fall-2019-g09.appspot.com/project
+        // TODO: Use Android Asynchronous Http Client (https://loopj.com/android-async-http/).
+        // TODO: See "Recommended Usage: Make a Static Http Client".
 
-        // Then redirect to some activity for example userActivity
-        //val intent = Intent(this, UserActivity::class.java)
-        //startActivity(intent)
-
-
+        // Then redirect to UserActivity.
+        // val intent = Intent(this, UserActivity::class.java)
+        // startActivity(intent)
     }
 
     private fun pickImageFromGallery() {
@@ -156,21 +161,23 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
         val hour = cal.get(Calendar.HOUR_OF_DAY)
         val minute = cal.get(Calendar.MINUTE)
 
-        val tpd = TimePickerDialog(this, TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-            cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
-            cal.set(Calendar.MINUTE, minute)
-            cal.set(Calendar.SECOND, 0)
-            val myFormat = "dd-MM-yyyy HH:mm:ss"
-            val sdf = SimpleDateFormat(myFormat, Locale.US)
-            textViewDeadline.text = sdf.format(cal.time)
-        }, hour, minute, true)
+        val tpd = TimePickerDialog(this,
+            TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
+                cal.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                cal.set(Calendar.MINUTE, minute)
+                cal.set(Calendar.SECOND, 0)
+                val myFormat = "dd-MM-yyyy HH:mm:ss"
+                val sdf = SimpleDateFormat(myFormat, Locale.US)
+                textViewDeadline.text = sdf.format(cal.time)
+            }, hour, minute, true)
         tpd.show()
 
-        val dpd = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-            cal.set(Calendar.YEAR, year)
-            cal.set(Calendar.MONTH, monthOfYear)
-            cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-        }, year, month, day)
+        val dpd = DatePickerDialog(this,
+            DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                cal.set(Calendar.YEAR, year)
+                cal.set(Calendar.MONTH, monthOfYear)
+                cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            }, year, month, day)
         dpd.show()
     }
 
