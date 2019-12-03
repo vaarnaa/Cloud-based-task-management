@@ -1,93 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="20dp">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:layout_marginHorizontal="30dp"
-        android:layout_marginBottom="10dp">
+        android:layout_margin="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="40sp"
+                android:text="@string/profile" />
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/signed_out" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="start"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="30dp">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="40sp"
-            android:text="@string/profile" />
+                android:id="@+id/userId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Firebase User ID: 123456789abc" />
 
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/displayName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Display name: userName" />
+
+            <TextView
+                android:id="@+id/profilePhotoUrl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Profile photo URL: http://url.com" />
+
+            <TextView
+                android:id="@+id/imageQualitySetting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Upload/download image quality: full" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/profileButtons"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/signed_out" />
+            android:orientation="vertical"
+            android:layout_marginHorizontal="30dp">
+
+            <Button
+                android:id="@+id/buttonChangePassword"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="@string/change_password" />
+
+            <Button
+                android:id="@+id/buttonChangeProfImg"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="@string/change_profImg" />
+
+            <Button
+                android:id="@+id/buttonChangeImgQ"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="@string/change_imgQ" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="start"
-        android:layout_marginHorizontal="30dp"
-        android:layout_marginBottom="30dp">
-
-    <TextView
-            android:id="@+id/userId"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Firebase User ID: 123456789abc" />
-
-        <TextView
-            android:id="@+id/displayName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Display name: userName" />
-
-        <TextView
-            android:id="@+id/profilePhotoUrl"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Profile photo URL: http://url.com" />
-
-        <TextView
-            android:id="@+id/imageQualitySetting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Upload/download image quality: full" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/profileButtons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginHorizontal="30dp">
-
-        <Button
-            android:id="@+id/buttonChangePassword"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="@string/change_password" />
-
-        <Button
-            android:id="@+id/buttonChangeProfImg"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="@string/change_profImg" />
-
-        <Button
-            android:id="@+id/buttonChangeImgQ"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="@string/change_imgQ" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</ScrollView>
