@@ -58,8 +58,8 @@ app.put('/project/:project_id/members', ctrls.ProjectController.attachUsers);
 // Task related
 // app.get('/project/:project_id/tasks', ctrls.TaskController.getAllTasks);
 app.post('/project/:project_id/task', ctrls.TaskController.createTask);
-// app.put('/project/:project_id/task/:task_id', ctrls.TaskController.updateTask);
-
+app.put('/project/:project_id/task/:task_id/status', ctrls.TaskController.updateTask);
+app.put('/project/:project_id/task/:task_id/assignments', ctrls.TaskController.assignTask);
 // Attachment related
 // app.get('/project/:project_id/attachments', ctrls.ProjectController.getAttachments);
 // app.post('/project/:project_id/attachment', ctrls.ProjectController.submitAttachment);

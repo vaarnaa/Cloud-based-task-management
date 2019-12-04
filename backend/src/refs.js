@@ -12,10 +12,27 @@ const resolveRef = async (ref) => {
 
 const getProjectAdmin = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}/admin`);
 const getProjectMembers = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}/members`);
+const isGroupProject = async (projectId) => {
+  const val = await resolveRef(`${PROJECT_ROOT}/type`);
+  return val === 'group';
+}
+
+const getProject = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}`);
+
+const belongsToProject = async (userId, projectId) => {
+  const { admin, members } = await getProject(projectId);
+  return admin === userId || members.find(member => member === userId);
+}
+
+const notBelongsToProject = async (userId, projectId) => !(await belongsToProject(userId, projectId));
 
 module.exports = {
   resolveRef,
   getProjectMembers,
   getProjectAdmin,
+  isGroupProject,
+  belongsToProject,
+  notBelongsToProject,
+  getProject,
   PROJECT_ROOT,
 }

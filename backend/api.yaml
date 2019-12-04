@@ -214,8 +214,9 @@ paths:
           description: "Malformed input"
           schema:
             $ref: "#/definitions/error"
-  /task/{taskId}:
+  /project/{projectId}/task/{taskId}/status:
     parameters:
+    - $ref: "#/parameters/projectId"
     - $ref: "#/parameters/taskId"
     put:
       operationId: "updateTask"
@@ -249,7 +250,7 @@ paths:
             $ref: "#/definitions/error"
         default:
           $ref: "#/responses/defaultErrorResponse"
-  /project/{projectId}/task/{taskId}:
+  /project/{projectId}/task/{taskId}/assignments:
     parameters:
     - $ref: "#/parameters/projectId"
     - $ref: "#/parameters/taskId"

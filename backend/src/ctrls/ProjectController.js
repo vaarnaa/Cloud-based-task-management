@@ -52,7 +52,7 @@ const ProjectController = {
   async createProject(req, res) {
     log.debug("ProjectController.createProject");
 
-    const { error } = projectBody.validate(req.body);
+    const { error, value } = projectBody.validate(req.body);
     if (error) {
       return res.status(422).json({ code: 422, message: error });
     }
@@ -60,16 +60,17 @@ const ProjectController = {
     const newId = database.ref().child(ref_root).push().key;
     const updates = {};
     const newProject = {
-      name: req.body.name,
-      description: req.body.description,
+      name: value.name,
+      description: value.description,
       admin: req.auth_user.id,
+      type: value.type,
       created: new Date(),
-      deadline: new Date(req.body.deadline),
-      badge: '', // url to image
-      tasks: [],
+      deadline: value.deadline && new Date(value.deadline),
+      badge: value.badge, // url to image
+      tasks: { },
       members: [],
-      keywords: [],
-      attachments: [],
+      keywords: value.keywords,
+      attachments: { },
     };
     updates[`${ref_root}/${newId}`] = newProject;
 

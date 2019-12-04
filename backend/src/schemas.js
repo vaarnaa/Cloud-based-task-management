@@ -7,13 +7,21 @@ const user = Joi.object({
   id: Joi.string().required(),
 });
 
+const userId = Joi.string().required();
+
 const taskStatus =
   Joi.string().valid('pending', 'on-going', 'completed');
 
+const projectType =
+  Joi.string().valid('personal', 'group');
+
 const projectBody = Joi.object({
   name: Joi.string().required(),
+  type: projectType.required(),
   description: Joi.string().required(),
-  deadline: Joi.date().required(),
+  deadline: Joi.date().optional(),
+  badge: Joi.string().optional(),
+  keywords: Joi.array().items(Joi.string()).max(3).optional()
 });
 
 const taskAttributesBody = Joi.object({
@@ -27,12 +35,16 @@ const taskStatusBody = Joi.object({
 });
 
 const usersBody = Joi.object({
-  users: Joi.array().items(user).required(),
+  users: Joi.array().items(userId).required(),
 });
 
 const membersBody = Joi.object({
   // "it can contain one or more users"
-  members: Joi.array().items(user).min(1).required(),
+  members: Joi.array().items(userId).min(1).required(),
+});
+
+const assignTaskBody = Joi.object({
+  assignments: Joi.array().items(userId).required(),
 });
 
 module.exports = {
@@ -40,5 +52,6 @@ module.exports = {
   taskAttributesBody,
   taskStatusBody,
   usersBody,
+  assignTaskBody,
   membersBody,
 };
