@@ -1,42 +1,39 @@
 package com.example.taskapplication
 
-
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
+import android.widget.RadioButton
 import android.widget.TextView
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.loopj.android.http.AsyncHttpResponseHandler
+import com.loopj.android.http.RequestParams
+import cz.msebera.android.httpclient.Header
 import kotlinx.android.synthetic.main.activity_create_project.*
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
-import android.widget.Toast
-import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import android.widget.RadioButton
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 
-
-
-
-class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
-
+class CreateProjectActivity : BaseActivity(), View.OnClickListener {
     private lateinit var textViewDeadline: TextView
     private lateinit var editTextKeywords: EditText
     private lateinit var editTextName: EditText
     private lateinit var editTextDescription: EditText
+    // Declare an instance of Firebase Auth.
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +47,8 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
         editTextKeywords = findViewById(R.id.et_project_keywords)
         editTextName = findViewById(R.id.et_project_name)
         editTextDescription = findViewById(R.id.et_project_description)
+        // Initialize Firebase instances.
+        auth = FirebaseAuth.getInstance()
     }
 
     //setting menu in action bar
@@ -73,8 +72,7 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private  fun saveProject() {
-
+    private fun saveProject() {
         // handle input and create new project
         val name = editTextName.text.toString()
         val description = editTextDescription.text.toString()
@@ -86,7 +84,8 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
         }
         val currentDate = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
-        var date = currentDate.format(formatter)
+        val date = currentDate.format(formatter)
+        // TODO:
 
         var keywords = listOf<String>()
         try {
@@ -104,7 +103,6 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         var imageB64:String? = null
-
         try {
             val stream = ByteArrayOutputStream()
             val bitmap = (projectIcon.getDrawable() as BitmapDrawable).bitmap
@@ -118,19 +116,91 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
 
         // get selected radio button from radioGroup
         val selectedRadioId = radioButtons.getCheckedRadioButtonId()
-
         // find the selected radiobutton by id
         val radioButton = findViewById<View>(selectedRadioId) as RadioButton
-        val projectType = radioButton.text
+        val projectType = radioButton.text.toString()
 
-        // TODO: Create a project with our API which returns the new project ID.
-        // TODO: POST https://mcc-fall-2019-g09.appspot.com/project
-        // TODO: Use Android Asynchronous Http Client (https://loopj.com/android-async-http/).
-        // TODO: See "Recommended Usage: Make a Static Http Client".
+        createProject(name, description, currentDate, keywords, imageB64, projectType)
+    }
 
-        // Then redirect to UserActivity.
-        // val intent = Intent(this, UserActivity::class.java)
-        // startActivity(intent)
+    private fun createProject(name: String,
+                              description: String,
+                              date: LocalDateTime,
+                              keywords: List<String>,
+                              imageB64: String?,
+                              projectType: String) {
+        showProgressDialog()
+        // Create a project with our API which returns the new project ID.
+        val user = auth.currentUser
+        user!!.getIdToken(true).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val idToken = task.result!!.token
+                Log.d(TAG, "idToken $idToken")
+                val params = RequestParams()
+                Log.d(TAG, "----- 1 ----- params $params")
+                params.put("name", name)
+                params.put("description", description)
+                params.put("date", date)
+                Log.d(TAG, "----- 2 ----- params $params")
+                params.put("access_token", idToken) // Must be included to identify the user.
+                // params.put("keywords", keywords)
+                // params.put("projectType", projectType)
+                /* TODO: Structure is:
+                    projectId: {
+                        admin: userId, // generated automatically
+                        badge: badgeUrl (in Firebase Storage),
+                        created: "Tue, 3 Dec 2019 07:00:00 GMT",
+                        deadline: "Wed, 14 Jun 2020 07:00:00 GMT",
+                        description: description,
+                        name: projectName,
+                        keywords: {
+                            keyword1: "",
+                            keyword2: "",
+                            keyword3: ""
+                        },
+                        members: {
+                            userId1: username1,
+                            userId2: username2,
+                            ...
+                        }
+                    }
+                 */
+                // POST https://mcc-fall-2019-g09.appspot.com/project
+                APIClient.post("project", params, object : AsyncHttpResponseHandler() {
+                    override fun onSuccess(
+                        statusCode: Int,
+                        headers: Array<out Header>?,
+                        response: ByteArray
+                    ) {
+                        // Called when response HTTP status is "200 OK".
+                        Log.d(TAG, "createProject:APIClient:Post:onSuccess")
+                        successRedirect()
+                    }
+                    override fun onFailure(
+                        statusCode: Int,
+                        headers: Array<out Header>?,
+                        responseBody: ByteArray?,
+                        error: Throwable?
+                    ) {
+                        // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
+                        Log.d(TAG, "createProject:APIClient:Post:onFailure")
+                        Log.d(TAG, "statusCode $statusCode")
+                        Log.d(TAG, "headers ${headers?.forEach(::println)}")
+                        Log.d(TAG, "responseBody ${responseBody.toString()}")
+                        Log.d(TAG, "error $error")
+                    }
+                })
+            } else {
+                // Handle error -> task.getException();
+            }
+            hideProgressDialog()
+        }
+    }
+
+    private fun successRedirect() {
+        // Redirect to ProjectsActivity upon success.
+        val intent = Intent(this, ProjectsActivity::class.java)
+        startActivity(intent)
     }
 
     private fun pickImageFromGallery() {
@@ -202,6 +272,8 @@ class CreateProjectActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     companion object {
+        // Used for printing debug messages. Usage: Log.d(TAG, "message")
+        private const val TAG = "CreateProjectActivity"
         // image pick code
         const val IMAGE_PICK_REQUEST = 1000
     }
