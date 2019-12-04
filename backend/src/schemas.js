@@ -18,7 +18,7 @@ const projectBody = Joi.object({
 
 const taskAttributesBody = Joi.object({
   description: Joi.string().required(),
-  status: taskStatus.required(), // or .default('pending'), but then must use the validation result in the controllers instead of the raw req body
+  status: taskStatus.default('pending'),
   deadline: Joi.date().required(),
 });
 
