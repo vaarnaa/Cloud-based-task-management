@@ -145,9 +145,9 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                 params.put("access_token", idToken) // Must be included to identify the user.
                 // params.put("keywords", keywords)
                 // params.put("projectType", projectType)
-                /* TODO: Structure is:
+                /* Structure is:
                     projectId: {
-                        admin: userId, // generated automatically
+                        admin: userId
                         badge: badgeUrl (in Firebase Storage),
                         created: "Tue, 3 Dec 2019 07:00:00 GMT",
                         deadline: "Wed, 14 Jun 2020 07:00:00 GMT",
