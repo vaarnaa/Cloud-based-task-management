@@ -53,6 +53,10 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         startActivity(intent)
     }
 
+    private fun populateProjectList(projects: Array<Map<String, String>>) {
+        // TODO: Render the retrieved projects into a ListView with the necessary attributes.
+    }
+
     private fun readFromDatabase(dbPath: DatabaseReference, action: String) {
         // Create a listener to be able to read from the database.
         val listener = object : ValueEventListener {
@@ -64,7 +68,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
                 if (dataSnapShot.exists()) {
                     // A key-value pair was found at the given database path.
                     when (action) {
-                        // "ABCD" -> BCDA(dataSnapShot.value.toString())
+                        // "populateProjectList" -> populateProjectList(dataSnapShot.value.toString())
                     }
                 } else {
                     // A key-value pair was not found at the given database path.
@@ -84,23 +88,14 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     private fun updateUI(user: FirebaseUser?) {
         hideProgressDialog()
         if (user != null) {
-            val userPath = database.child("users").child(user.uid)
-            val imgQuality = userPath.child("imageQuality")
+            val projectsPath = database.child("projects")
             // The user is signed in.
-            /*status.text = getString(R.string.emailpassword_status_fmt, user.email)
-            userId.text = getString(R.string.firebase_status_fmt, user.uid)
-            displayName.text = getString(R.string.firebase_display_name_fmt, user.displayName)
-            profilePhotoUrl.text = getString(R.string.firebase_profile_photo_fmt, user.photoUrl)
-            readFromDatabase(imgQuality, "updateImageQuality")
-            profileButtons.visibility = View.VISIBLE*/
+            // TODO: Fetch all projects here, sorted by modification date.
+            //       For each, show modification date, media icon, and up to 3 profile images.
+            //       Database URL: /projects
+            readFromDatabase(projectsPath, "populateProjectList")
         } else {
             // The user is signed out, so redirect to the login page.
-            /*status.setText(R.string.signed_out)
-            userId.text = null
-            displayName.text = null
-            profilePhotoUrl.text = null
-            imageQualitySetting.text = null
-            profileButtons.visibility = View.GONE*/
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
@@ -109,6 +104,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     override fun onClick(v: View) {
         when (v.id) {
             R.id.fab -> createProject()
+            // TODO: Pass on the projectId of a project that is clicked as an Intent extra.
         }
     }
 

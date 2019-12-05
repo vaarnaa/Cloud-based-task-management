@@ -1,7 +1,6 @@
 package com.example.taskapplication
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -54,6 +53,10 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
         startActivity(intent)
     }
 
+    private fun populateTaskList(projects: Map<String, String>) {
+        // TODO: Render the retrieved tasks into a ListView with the necessary attributes.
+    }
+
     private fun readFromDatabase(dbPath: DatabaseReference, action: String) {
         // Create a listener to be able to read from the database.
         val listener = object : ValueEventListener {
@@ -65,7 +68,7 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
                 if (dataSnapShot.exists()) {
                     // A key-value pair was found at the given database path.
                     when (action) {
-                        // "ABCD" -> BCDA(dataSnapShot.value.toString())
+                        // "populateTaskList" -> populateTaskList(dataSnapShot.value.toString())
                     }
                 } else {
                     // A key-value pair was not found at the given database path.
@@ -85,23 +88,18 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
     private fun updateUI(user: FirebaseUser?) {
         hideProgressDialog()
         if (user != null) {
-            val userPath = database.child("users").child(user.uid)
-            val imgQuality = userPath.child("imageQuality")
+            // The projectId of this project must be passed as
+            // an extra from an Activity calling this activity.
+            val projectId = intent.extras?.getString("projectId")
+            val projectPath = database.child("projects").child(projectId!!)
+            val tasksPath = projectPath.child("tasks")
             // The user is signed in.
-            /*status.text = getString(R.string.emailpassword_status_fmt, user.email)
-            userId.text = getString(R.string.firebase_status_fmt, user.uid)
-            displayName.text = getString(R.string.firebase_display_name_fmt, user.displayName)
-            profilePhotoUrl.text = getString(R.string.firebase_profile_photo_fmt, user.photoUrl)
-            readFromDatabase(imgQuality, "updateImageQuality")
-            profileButtons.visibility = View.VISIBLE*/
+            // TODO: Fetch all project tasks here, sorted by creation date.
+            //       For each, display a checkbox next to it.
+            //       Database URL: /projects/<projectId>/tasks
+            readFromDatabase(tasksPath, "populateTaskList")
         } else {
             // The user is signed out, so redirect to the login page.
-            /*status.setText(R.string.signed_out)
-            userId.text = null
-            displayName.text = null
-            profilePhotoUrl.text = null
-            imageQualitySetting.text = null
-            profileButtons.visibility = View.GONE*/
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
