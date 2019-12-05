@@ -1,7 +1,7 @@
 module.exports = {
-  'ProjectController': require('./ProjectController'),
-  'TaskController': require('./TaskController'),
-};
+    'ProjectController': require('./ProjectController'),
+    'TaskController': require('./TaskController'),
+}
 
 // Notes:
 
