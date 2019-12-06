@@ -1,23 +1,18 @@
 image: node:latest
 
 stages:
-  - install
   - test
-
-install:
-  stage: install
-  script:
-    - cd backend
-    - npm install
 
 eslint:
   stage: test
   script:
     - cd backend
+    - npm install
     - npm run lint
 
 jest:
   stage: test
   script:
     - cd backend
+    - npm install
     - npm test
