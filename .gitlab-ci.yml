@@ -1,8 +1,5 @@
 image: node:latest
 
-stages:
-  - test
-
 eslint:
   stage: test
   script:
@@ -20,3 +17,14 @@ jest:
   artifacts:
     paths:
       - backend/coverage/
+
+pages:
+  stage: deploy
+  script:
+    - mv backend/coverage/lcov-report/ public/
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+  only:
+    - master
