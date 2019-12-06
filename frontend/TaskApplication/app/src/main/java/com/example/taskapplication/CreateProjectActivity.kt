@@ -16,10 +16,14 @@ import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.loopj.android.http.AsyncHttpResponseHandler
+import com.loopj.android.http.JsonHttpResponseHandler
 import com.loopj.android.http.RequestParams
 import cz.msebera.android.httpclient.Header
 import kotlinx.android.synthetic.main.activity_create_project.*
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -34,6 +38,8 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
     private lateinit var editTextDescription: EditText
     // Declare an instance of Firebase Auth.
     private lateinit var auth: FirebaseAuth
+    // Declare an instance of Firebase Realtime Database.
+    private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +55,7 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
         editTextDescription = findViewById(R.id.et_project_description)
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
     }
 
     //setting menu in action bar
@@ -166,27 +173,37 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                     }
                  */
                 // POST https://mcc-fall-2019-g09.appspot.com/project
-                APIClient.post("project", params, object : AsyncHttpResponseHandler() {
+                APIClient.post("project", params, object : JsonHttpResponseHandler() {
                     override fun onSuccess(
                         statusCode: Int,
                         headers: Array<out Header>?,
-                        response: ByteArray
+                        response: JSONObject
                     ) {
                         // Called when response HTTP status is "200 OK".
                         Log.d(TAG, "createProject:APIClient:Post:onSuccess")
-                        successRedirect()
+                        // Add the received project ID to this user's projects.
+                        val pid = response.getString("id")
+                        database.child("users")
+                            .child(auth.uid!!)
+                            .child("projects")
+                            .child(pid)
+                            .setValue("")
+                            .addOnSuccessListener {
+                                Log.d(TAG, "POST SUCCEEDED, REDIRECTING")
+                                successRedirect()
+                            }
                     }
                     override fun onFailure(
                         statusCode: Int,
                         headers: Array<out Header>?,
-                        responseBody: ByteArray?,
+                        responseString: String,
                         error: Throwable?
                     ) {
                         // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
                         Log.d(TAG, "createProject:APIClient:Post:onFailure")
                         Log.d(TAG, "statusCode $statusCode")
                         Log.d(TAG, "headers ${headers?.forEach(::println)}")
-                        Log.d(TAG, "responseBody ${responseBody.toString()}")
+                        Log.d(TAG, "responseString $responseString")
                         Log.d(TAG, "error $error")
                     }
                 })

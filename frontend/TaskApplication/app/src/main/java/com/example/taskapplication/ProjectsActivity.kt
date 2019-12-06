@@ -5,26 +5,56 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ListView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_projects.*
+import java.util.*
 
 class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     // Declare an instance of Firebase Auth.
     private lateinit var auth: FirebaseAuth
     // Declare an instance of Firebase Realtime Database.
     private lateinit var database: DatabaseReference
+    // Declare an instance of ListView to display the list of projects.
+    private lateinit var listView: ListView
+    private val projectEntries = arrayListOf(
+        "project1", "project2", "project3",
+        "project4", "project5", "project6",
+        "project7", "project8", "project9",
+        "project10", "project11", "project12",
+        "project13", "project14", "project15",
+        "project1", "project2", "project3",
+        "project4", "project5", "project6",
+        "project7", "project8", "project9",
+        "project10", "project11", "project12",
+        "project13", "project14", "project15"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_projects)
-        setSupportActionBar(toolbar)
+        // setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         // Handle clicks in `onClick`.
         fab.setOnClickListener(this)
+        // Initialize the project list and the adapter used to populate it.
+        listView = projectsListView
+        val customAdapter = ProjectsCustomAdapter(applicationContext, projectEntries)
+        listView.adapter = customAdapter
+        // TODO: To refresh the view, call customAdapter.notifyDataSetChanged()
+        listView.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+                // Call getItemAtPosition(position) to access items.
+                Log.d(TAG, "parent $parent")
+                Log.d(TAG, "view $view")
+                Log.d(TAG, "position $position")
+                Log.d(TAG, "id $id")
+            }
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
@@ -53,7 +83,15 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         startActivity(intent)
     }
 
-    private fun populateProjectList(projects: Array<Map<String, String>>) {
+    private fun fetchProjects(projectIds: DataSnapshot) {
+        // Fetch the list of the current user's projects.
+        val l = arrayListOf<String>()
+        projectIds.children.forEach { l.add(it.key.toString()) }
+        val p = l.toTypedArray()
+        Log.d(TAG, "populateProjectList:p: ${p.contentToString()}")
+    }
+
+    private fun populateProjectList(projects: DataSnapshot) {
         // TODO: Render the retrieved projects into a ListView with the necessary attributes.
     }
 
@@ -68,7 +106,8 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
                 if (dataSnapShot.exists()) {
                     // A key-value pair was found at the given database path.
                     when (action) {
-                        // "populateProjectList" -> populateProjectList(dataSnapShot.value.toString())
+                        "fetchProjects" -> fetchProjects(dataSnapShot)
+                        "populateProjectList" -> populateProjectList(dataSnapShot)
                     }
                 } else {
                     // A key-value pair was not found at the given database path.
@@ -88,12 +127,14 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     private fun updateUI(user: FirebaseUser?) {
         hideProgressDialog()
         if (user != null) {
-            val projectsPath = database.child("projects")
+            val userProjectsPath = database.child("users")
+                .child(auth.uid!!)
+                .child("projects")
             // The user is signed in.
             // TODO: Fetch all projects here, sorted by modification date.
             //       For each, show modification date, media icon, and up to 3 profile images.
             //       Database URL: /projects
-            readFromDatabase(projectsPath, "populateProjectList")
+            readFromDatabase(userProjectsPath, "fetchProjects")
         } else {
             // The user is signed out, so redirect to the login page.
             val intent = Intent(this, MainActivity::class.java)

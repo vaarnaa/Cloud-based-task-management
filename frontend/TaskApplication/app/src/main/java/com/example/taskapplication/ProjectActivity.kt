@@ -94,7 +94,7 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
             val projectPath = database.child("projects").child(projectId!!)
             val tasksPath = projectPath.child("tasks")
             // The user is signed in.
-            // TODO: Fetch all project tasks here, sorted by creation date.
+            // TODO: Fetch all tasks here, sorted by creation date.
             //       For each, display a checkbox next to it.
             //       Database URL: /projects/<projectId>/tasks
             readFromDatabase(tasksPath, "populateTaskList")
