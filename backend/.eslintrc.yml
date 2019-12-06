@@ -21,3 +21,6 @@ rules:
   semi:
     - error
     - never
+  max-len:
+    - error
+    - 130
