@@ -3,11 +3,21 @@
 const request = require('supertest')
 const util = require('util')
 const app = require('./app')
+const {database} = require('./db')
+
+afterAll(() => database.goOffline())
 
 const default_headers = {
     'x-endpoint-api-userinfo':
     'eyJpc3N1ZXIiOiJUT0tFTl9JU1NVRVIiLCJpZCI6Ikl3M0JtS2V6cjVoRWw5QUFIM2RkVm1IQWxzOTIiLCJlbWFpbCI6InRlbXBAZXhhbXBsZS5sb2NhbCJ9'
 }
+
+describe('Web server', () => {
+    it('Front page', async () => {
+        const res = await request(app).get('/').send()
+        expect(res.statusCode).toEqual(200)
+    })
+})
 
 describe('ProjectController', () => {
     let res, project_id
