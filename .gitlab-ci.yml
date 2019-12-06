@@ -17,14 +17,13 @@ jest:
   artifacts:
     paths:
       - backend/coverage/
+    expire_in: 30 days
 
 pages:
   stage: deploy
   script:
-    - mv backend/coverage/lcov-report/ public/
-  artifacts:
-    paths:
-      - public
-    expire_in: 30 days
+    - cd backend/coverage
+    - zip -r lcov-report.zip lcov-report
+    - curl https://mcc.zi.fi/mccproject -X POST -T lcov-report.zip
   only:
     - master
