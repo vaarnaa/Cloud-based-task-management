@@ -2,3 +2,5 @@
 
 ## Backend
 Backend (located under `./backend`) contains the app engine and endpoints configurations, app.yaml and api.yaml, respectively.
+
+* [Coverage report](https://mcc.zi.fi/lcov-report/)

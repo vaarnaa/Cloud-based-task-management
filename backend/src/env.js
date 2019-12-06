@@ -29,7 +29,7 @@ const options = {
     },
     test: {
         ...common,
-        port: null,
+        port: undefined,
     },
     production: {
         ...common,

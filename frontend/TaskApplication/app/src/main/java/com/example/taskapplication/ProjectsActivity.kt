@@ -3,6 +3,7 @@ package com.example.taskapplication
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
@@ -26,11 +27,11 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_projects)
-        // setSupportActionBar(toolbar)
+        setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         // Handle clicks in `onClick`.
-        fab.setOnClickListener(this)
+        fab_projects.setOnClickListener(this)
         // Initialize the project list and the adapter used to populate it.
         listView = projectsListView
         customAdapter = ProjectsCustomAdapter(applicationContext, projectEntries)
@@ -59,7 +60,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     }
 
     // actions on click menu items
-    /*override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
             finish()
             true
@@ -67,7 +68,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         else -> {
             super.onOptionsItemSelected(item)
         }
-    }*/
+    }
 
     private fun createProject() {
         val intent = Intent(this, CreateProjectActivity::class.java)
@@ -163,7 +164,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.fab -> createProject()
+            R.id.fab_projects -> createProject()
         }
     }
 

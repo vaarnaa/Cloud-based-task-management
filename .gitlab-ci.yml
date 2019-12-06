@@ -1,8 +1,5 @@
 image: node:latest
 
-stages:
-  - test
-
 eslint:
   stage: test
   script:
@@ -16,3 +13,17 @@ jest:
     - cd backend
     - npm install
     - npm test
+  coverage: '/^All files\s+\|\s+\d+\.*\d*\s+\|\s*(\d+\.*\d*)/'
+  artifacts:
+    paths:
+      - backend/coverage/
+    expire_in: 30 days
+
+pages:
+  stage: deploy
+  script:
+    - cd backend/coverage
+    - zip -r lcov-report.zip lcov-report
+    - curl https://mcc.zi.fi/mccproject -X POST -T lcov-report.zip
+  only:
+    - master

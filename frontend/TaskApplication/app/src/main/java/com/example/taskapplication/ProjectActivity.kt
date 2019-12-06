@@ -3,10 +3,13 @@ package com.example.taskapplication
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ListView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
@@ -20,21 +23,17 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
     // Declare an instance of ListView to display the list of tasks.
     private lateinit var listView: ListView
     private lateinit var taskAdapter: TasksCustomAdapter
-    /*private var taskEntries = arrayListOf(mapOf(
-        "a" to "av",
-        "b" to "bv"
-    ))*/
     private val taskEntries = arrayListOf<Map<String, String>>()
     private var updatingTaskList = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_project)
-        // setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
+        setSupportActionBar(findViewById(R.id.toolbar))
         // Handle clicks in `onClick`.
-        fab.setOnClickListener(this)
+        fab_project.setOnClickListener(this)
         // Initialize the task list and the adapter used to populate it.
         listView = projectTasksView
         taskAdapter = TasksCustomAdapter(applicationContext, taskEntries)
@@ -43,6 +42,8 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
     }
 
     public override fun onStart() {
@@ -53,7 +54,7 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
     }
 
     // actions on click menu items
-    /*override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
             finish()
             true
@@ -61,7 +62,46 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
         else -> {
             super.onOptionsItemSelected(item)
         }
-    }*/
+    }
+
+    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        // Open fragment for the specific menu item
+        when (item.itemId) {
+            R.id.navigation_tasks -> {
+                Toast.makeText(this,
+                    "Tasks clicked",
+                    Toast.LENGTH_SHORT).show()
+                //val tasksFragment = TasksFragment.newInstance()
+                //openFragment(songsFragment)
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_pictures -> {
+                Toast.makeText(this,
+                    "Pictures clicked",
+                    Toast.LENGTH_SHORT).show()
+                //val picturesFragment = PicturesFragment.newInstance()
+                //openFragment(albumsFragment)
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_files -> {
+                Toast.makeText(this,
+                    "Files clicked",
+                    Toast.LENGTH_SHORT).show()
+                //val filesFragment = FilesFragment.newInstance()
+                //openFragment(artistsFragment)
+                return@OnNavigationItemSelectedListener true
+            }
+        }
+        false
+    }
+
+    private fun openFragment(fragment: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.container, fragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
+    }
+
 
     private fun createTask() {
         val intent = Intent(this, CreateTaskActivity::class.java)
@@ -164,7 +204,7 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.fab -> createTask()
+            R.id.fab_project -> createTask()
         }
     }
 

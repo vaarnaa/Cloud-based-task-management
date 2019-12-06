@@ -14,7 +14,7 @@ const resolveRef = async (ref) => {
 const getProjectAdmin = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}/admin`)
 const getProjectMembers = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}/members`)
 const isGroupProject = async (projectId) => {
-    const val = await resolveRef(`${PROJECT_ROOT}/type`)
+    const val = await resolveRef(`${PROJECT_ROOT}/${projectId}/type`)
     return val === 'group'
 }
 

@@ -32,3 +32,5 @@ rules:
   strict:
     - error
     - global
+  jest/no-disabled-tests:
+    - off

@@ -77,7 +77,7 @@ const ProjectController = {
 
         const values = await database.ref().update(updates)
 
-        log.debug(`ProjectController.createProject: created: ${newId} with: ${JSON.stringify(updates)}`)
+        log.debug(`ProjectController.createProject: created: ${newId} with: ${JSON.stringify(values)}`)
         res.status(201).json({ project_id: newId })
     },
 
