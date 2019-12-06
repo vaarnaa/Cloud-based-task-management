@@ -102,6 +102,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
             Log.d(TAG, "it: $it")
             it.getValue("modified")
         })
+        projectEntries.reverse()
         Log.d(TAG,"sorted projectsEntries: ${projectEntries.toTypedArray().contentToString()}")
         updatingProjectList = false
         // Refresh the project list view.
