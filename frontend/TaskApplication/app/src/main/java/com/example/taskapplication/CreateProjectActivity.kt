@@ -92,7 +92,6 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
         val currentDate = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
         val date = currentDate.format(formatter)
-        // TODO:
 
         var keywords = listOf<String>()
         try {
