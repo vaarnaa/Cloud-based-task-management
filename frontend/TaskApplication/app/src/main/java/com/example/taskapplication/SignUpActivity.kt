@@ -8,6 +8,8 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_signup.*
@@ -36,16 +38,19 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Account creation success.
                     Log.d(TAG, "createUserWithEmail:success")
+
                     // Set the display name and profile image of the user.
                     val user = auth.currentUser!!
+
                     // Register the display name in the database.
                     database.child("usernames").child(username).setValue(user.uid)
+
                     // Register other user profile info in the database.
                     val userProfilePath = database.child("users").child(user.uid)
                     userProfilePath.child("username").setValue(username)
                     userProfilePath.child("imageQuality").setValue("high")
+
                     val profileUpdates = UserProfileChangeRequest.Builder()
                         .setDisplayName(username)
                         .setPhotoUri(Uri.parse(et_prof_img.text.toString()))
@@ -54,16 +59,27 @@ class SignUpActivity : BaseActivity(), View.OnClickListener {
                         .addOnCompleteListener { t ->
                             if (t.isSuccessful) {
                                 Log.d(TAG, "User profile updated.")
+
+                                // Redirect the user to the user activity.
+                                val intent = Intent(this, UserActivity::class.java)
+                                startActivity(intent)
+                            } else {
+                              Log.w(TAG, String.format("User profile update was not successfull: %s", t.exception.toString()))
                             }
                         }
-                    // Redirect the user to the user activity.
-                    val intent = Intent(this, UserActivity::class.java)
-                    startActivity(intent)
+
                 } else {
                     // If account creation fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.exception)
                     Toast.makeText(baseContext, "Signing up failed.",
                         Toast.LENGTH_SHORT).show()
+
+                    if (task.exception is FirebaseAuthWeakPasswordException)
+                        et_password.error = "Password should be at least 6 characters"
+
+                    else if (task.exception is FirebaseAuthUserCollisionException)
+                        et_email.error = "Email already registered"
+
                 }
                 hideProgressDialog()
             }
