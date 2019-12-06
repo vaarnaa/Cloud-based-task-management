@@ -1,3 +1,4 @@
+'use strict'
 const { database } = require('../db')
 const { taskAttributesBody, taskStatusBody, assignTaskBody } = require('../schemas')
 const {

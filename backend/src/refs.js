@@ -1,3 +1,4 @@
+'use strict'
 const log = require('./log')
 const { database } = require('./db')
 

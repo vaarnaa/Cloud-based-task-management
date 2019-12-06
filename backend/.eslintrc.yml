@@ -1,8 +1,13 @@
+plugins:
+  - jest
 env:
   commonjs: true
   es6: true
   node: true
-extends: 'eslint:recommended'
+  jest/globals: true
+extends:
+  - eslint:recommended
+  - plugin:jest/recommended
 globals:
   Atomics: readonly
   SharedArrayBuffer: readonly
@@ -21,3 +26,9 @@ rules:
   semi:
     - error
     - never
+  max-len:
+    - error
+    - 130
+  strict:
+    - error
+    - global

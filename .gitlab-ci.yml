@@ -1,0 +1,18 @@
+image: node:latest
+
+stages:
+  - test
+
+eslint:
+  stage: test
+  script:
+    - cd backend
+    - npm install
+    - npm run lint
+
+jest:
+  stage: test
+  script:
+    - cd backend
+    - npm install
+    - npm test

@@ -1,6 +1,8 @@
+'use strict'
 const Joi = require('@hapi/joi')
 
-// Google Endpoints doesn't provide full-fledged schema validation (https://cloud.google.com/endpoints/docs/openapi/openapi-limitations)
+// Google Endpoints doesn't provide full-fledged schema validation
+// https://cloud.google.com/endpoints/docs/openapi/openapi-limitations
 // so should validate on our end
 
 const user = Joi.object({

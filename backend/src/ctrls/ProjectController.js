@@ -1,3 +1,4 @@
+'use strict'
 const { database } = require('../db')
 const { projectBody, membersBody } = require('../schemas')
 const { getProjectAdmin, getProjectMembers, PROJECT_ROOT } = require('../refs')
@@ -143,7 +144,9 @@ const ProjectController = {
             return res.status(403).json({ code: 403, message: 'Forbidden operation' })
         }
 
-        const data = await database.ref(`${ref_root}/${req.params.project_id}/members`).set(req.body.members.map(member => member.id))
+        const data = await database.ref(
+            `${ref_root}/${req.params.project_id}/members`
+        ).set(req.body.members.map(member => member.id))
         res.status(200).json(data)
     },
 }

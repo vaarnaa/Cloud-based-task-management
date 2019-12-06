@@ -1,3 +1,4 @@
+'use strict'
 const firebase = require('firebase')
 const env = require('./env')
 const log = require('./log')

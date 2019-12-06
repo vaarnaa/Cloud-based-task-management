@@ -8,7 +8,9 @@
     "npm": "6.x"
   },
   "scripts": {
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "lint": "eslint src",
+    "test": "jest"
   },
   "author": "",
   "private": true,
@@ -23,6 +25,15 @@
     "firebase-admin": "8.8.0"
   },
   "devDependencies": {
-    "eslint": "^6.7.2"
+    "eslint": "^6.7.2",
+    "eslint-plugin-jest": "^23.1.1",
+    "jest": "^24.9.0",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }

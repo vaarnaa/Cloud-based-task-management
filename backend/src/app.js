@@ -1,3 +1,4 @@
+'use strict'
 const env = require('./env')
 const express = require('express')
 require('express-async-errors')
@@ -80,8 +81,10 @@ app.use(function (err, req, res)
     res.status(500).send('ERROR 500: Something broke!')
 })
 
-app.listen(env.port, () => {
-    log.info(`Express listening on port ${env.port}`)
-})
+if (env.port !== undefined) {
+    app.listen(env.port, () => {
+        log.info(`Express listening on port ${env.port}`)
+    })
+}
 
 module.exports = app
