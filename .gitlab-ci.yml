@@ -17,3 +17,6 @@ jest:
     - npm install
     - npm test
   coverage: '/^All files\s+\|\s+\d+\.*\d*\s+\|\s*(\d+\.*\d*)/'
+  artifacts:
+    paths:
+      - backend/coverage/
