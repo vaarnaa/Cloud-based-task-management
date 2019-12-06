@@ -1,9 +1,23 @@
 image: node:latest
 
 stages:
-  - lint
+  - install
+  - test
+
+install:
+  stage: install
+  script:
+    - cd backend
+    - npm install
 
 eslint:
-  stage: lint
+  stage: test
   script:
-    - npx eslint --config backend/.eslintrc.yml backend/src
+    - cd backend
+    - npm run lint
+
+jest:
+  stage: test
+  script:
+    - cd backend
+    - npm test
