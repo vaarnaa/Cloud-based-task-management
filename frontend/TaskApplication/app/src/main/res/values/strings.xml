@@ -33,6 +33,7 @@
     <string name="new_profile_image_url">New profile image URL</string>
     <string name="new_password">New password</string>
     <string name="new_password_confirmation">Confirm new password</string>
+    <string name="current_password">Current password</string>
     <string name="profile_image_url">Profile image URL</string>
     <string name="project_description">Description</string>
     <string name="project_name">Name</string>
