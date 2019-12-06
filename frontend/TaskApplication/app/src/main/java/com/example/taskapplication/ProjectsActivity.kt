@@ -97,6 +97,12 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         while (updatingProjectList) { }
         updatingProjectList = true
         projectEntries.add(projectMap)
+        // Sort the list by modification date, recent ones first.
+        projectEntries.sortWith(compareBy {
+            Log.d(TAG, "it: $it")
+            it.getValue("modified")
+        })
+        Log.d(TAG,"sorted projectsEntries: ${projectEntries.toTypedArray().contentToString()}")
         updatingProjectList = false
         // Refresh the project list view.
         customAdapter.notifyDataSetChanged()
