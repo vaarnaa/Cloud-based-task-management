@@ -14,7 +14,10 @@
         <activity android:name=".CreateTaskActivity"
             android:label="Create task"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".ProjectActivity" />
+        <activity
+            android:name=".ProjectActivity"
+            android:label="Project"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".CreateProjectActivity"
             android:label="@string/title_create_project"
