@@ -19,8 +19,6 @@ object APIClient {
     }
 
     fun post(url: String, params: RequestParams? = null, rh: AsyncHttpResponseHandler? = null) {
-        Log.d(TAG, "POST url ${getAbsoluteUrl(url)}")
-        Log.d(TAG, "POST params $params")
         client.post(getAbsoluteUrl(url), params, rh)
     }
 

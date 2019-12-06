@@ -3,7 +3,6 @@ package com.example.taskapplication
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
@@ -12,7 +11,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_projects.*
-import java.util.*
 
 class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     // Declare an instance of Firebase Auth.
@@ -21,18 +19,9 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     private lateinit var database: DatabaseReference
     // Declare an instance of ListView to display the list of projects.
     private lateinit var listView: ListView
-    private val projectEntries = arrayListOf(
-        "project1", "project2", "project3",
-        "project4", "project5", "project6",
-        "project7", "project8", "project9",
-        "project10", "project11", "project12",
-        "project13", "project14", "project15",
-        "project1", "project2", "project3",
-        "project4", "project5", "project6",
-        "project7", "project8", "project9",
-        "project10", "project11", "project12",
-        "project13", "project14", "project15"
-    )
+    private lateinit var customAdapter: ProjectsCustomAdapter
+    private val projectEntries = arrayListOf<Map<String, String>>()
+    private var updatingProjectList = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,16 +33,12 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         fab.setOnClickListener(this)
         // Initialize the project list and the adapter used to populate it.
         listView = projectsListView
-        val customAdapter = ProjectsCustomAdapter(applicationContext, projectEntries)
+        customAdapter = ProjectsCustomAdapter(applicationContext, projectEntries)
         listView.adapter = customAdapter
-        // TODO: To refresh the view, call customAdapter.notifyDataSetChanged()
         listView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, view, position, id ->
+            AdapterView.OnItemClickListener { _, _, position, _ ->
                 // Call getItemAtPosition(position) to access items.
-                Log.d(TAG, "parent $parent")
-                Log.d(TAG, "view $view")
                 Log.d(TAG, "position $position")
-                Log.d(TAG, "id $id")
             }
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
@@ -88,11 +73,34 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         val l = arrayListOf<String>()
         projectIds.children.forEach { l.add(it.key.toString()) }
         val p = l.toTypedArray()
-        Log.d(TAG, "populateProjectList:p: ${p.contentToString()}")
+        Log.d(TAG, "fetchProjects:p: ${p.contentToString()}")
+        // Fetch the project contents for each project ID.
+        projectEntries.clear()
+        for (id in p) {
+            readFromDatabase(database.child("projects").child(id),
+                "populateProjectList")
+        }
     }
 
     private fun populateProjectList(projects: DataSnapshot) {
-        // TODO: Render the retrieved projects into a ListView with the necessary attributes.
+        // Render the retrieved projects into a ListView with the necessary attributes.
+        Log.d(TAG, "populateProjectList:projects: $projects")
+        val pid = projects.key.toString()
+        val name = projects.child("name").value.toString()
+        val modified = projects.child("modified").value.toString()
+        val projectMap = mapOf(
+            "pid" to pid,
+            "name" to name,
+            "modified" to modified)
+        Log.d(TAG, "pid: $pid name: $name modified: $modified")
+        // Ensure mutual exclusion while updating the critical section.
+        while (updatingProjectList) { }
+        updatingProjectList = true
+        projectEntries.add(projectMap)
+        updatingProjectList = false
+        // Refresh the project list view.
+        customAdapter.notifyDataSetChanged()
+        Log.d(TAG, "projectEntries:${projectEntries.toTypedArray().contentToString()}")
     }
 
     private fun readFromDatabase(dbPath: DatabaseReference, action: String) {
@@ -116,7 +124,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
             override fun onCancelled(databaseError: DatabaseError) {
                 // An error occurred (probably due to incorrect Firebase Database rules).
                 Log.d(TAG, "readFromDatabase:onCancelled: $databaseError")
-                Toast.makeText(baseContext, "Something went wrong when reading from database",
+                Toast.makeText(baseContext, "Error while reading from database",
                     Toast.LENGTH_SHORT).show()
             }
         }
@@ -130,10 +138,8 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
             val userProjectsPath = database.child("users")
                 .child(auth.uid!!)
                 .child("projects")
-            // The user is signed in.
-            // TODO: Fetch all projects here, sorted by modification date.
-            //       For each, show modification date, media icon, and up to 3 profile images.
-            //       Database URL: /projects
+            // The user is signed in, so fetch all projects here, sorted by modification date.
+            // For each, show modification date, media icon, and up to 3 profile images.
             readFromDatabase(userProjectsPath, "fetchProjects")
         } else {
             // The user is signed out, so redirect to the login page.

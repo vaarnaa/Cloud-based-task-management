@@ -48,6 +48,7 @@
     <string name="radio_group">Group</string>
     <string name="change_imgQ">Change image quality</string>
     <string name="image_quality">Image quality</string>
+    <string name="projects_list_modified_text">Modified: %s</string>
     <string-array name="image_quality_array">
         <item>Full (original size)</item>
         <item>High (1280x960 px)</item>

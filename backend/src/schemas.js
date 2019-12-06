@@ -5,9 +5,11 @@ const Joi = require('@hapi/joi')
 // https://cloud.google.com/endpoints/docs/openapi/openapi-limitations
 // so should validate on our end
 
+/*
 const user = Joi.object({
     id: Joi.string().required(),
 })
+*/
 
 const userId = Joi.string().required()
 
