@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import kotlinx.android.synthetic.main.activity_projects_list_view.view.*
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Month
 import java.time.format.DateTimeFormatter
 
 class ProjectsCustomAdapter(applicationContext: Context,
@@ -22,8 +20,8 @@ class ProjectsCustomAdapter(applicationContext: Context,
         return ps.size
     }
 
-    override fun getItem(i: Int): Any? {
-        return null
+    override fun getItem(i: Int): Map<String, String>? {
+        return ps[i]
     }
 
     override fun getItemId(i: Int): Long {

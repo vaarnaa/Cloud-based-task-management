@@ -36,9 +36,15 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         customAdapter = ProjectsCustomAdapter(applicationContext, projectEntries)
         listView.adapter = customAdapter
         listView.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-                // Call getItemAtPosition(position) to access items.
+            AdapterView.OnItemClickListener { parent, _, position, _ ->
+                // Redirect to the clicked project item,
+                // passing on the projectId as an Intent extra.
                 Log.d(TAG, "position $position")
+                Log.d(TAG, "getItemAtPosition ${parent.getItemAtPosition(position)}")
+                val pid = customAdapter.getItem(position)!!.getValue("pid")
+                val intent = Intent(this, ProjectActivity::class.java)
+                intent.putExtra("pid", pid)
+                startActivity(intent)
             }
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
@@ -103,7 +109,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
             it.getValue("modified")
         })
         projectEntries.reverse()
-        Log.d(TAG,"sorted projectsEntries: ${projectEntries.toTypedArray().contentToString()}")
+        Log.d(TAG,"sorted projectEntries: ${projectEntries.toTypedArray().contentToString()}")
         updatingProjectList = false
         // Refresh the project list view.
         customAdapter.notifyDataSetChanged()
@@ -158,7 +164,6 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     override fun onClick(v: View) {
         when (v.id) {
             R.id.fab -> createProject()
-            // TODO: Pass on the projectId of a project that is clicked as an Intent extra.
         }
     }
 
