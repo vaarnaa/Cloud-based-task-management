@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node src/app.js",
     "lint": "eslint src",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "author": "",
   "private": true,
