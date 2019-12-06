@@ -3,6 +3,7 @@
 const common = {
     version: '0.0.1',
     port: process.env.PORT || 8080,
+    debug: false,
 
     // To use firebase db, fill in following firebase settings:
     // 1. goto https://console.firebase.google.com/project/mcc-fall-2019-g09/settings
@@ -26,9 +27,12 @@ const options = {
         ...common,
         debug: true,
     },
+    test: {
+        ...common,
+        port: null,
+    },
     production: {
         ...common,
-        debug: false,
     }
 }
 
