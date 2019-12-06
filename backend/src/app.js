@@ -1,3 +1,4 @@
+'use strict'
 const env = require('./env')
 const express = require('express')
 require('express-async-errors')

@@ -1,3 +1,4 @@
+'use strict'
 const { database } = require('../db')
 const { projectBody, membersBody } = require('../schemas')
 const { getProjectAdmin, getProjectMembers, PROJECT_ROOT } = require('../refs')

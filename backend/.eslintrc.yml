@@ -29,3 +29,6 @@ rules:
   max-len:
     - error
     - 130
+  strict:
+    - error
+    - global

@@ -1,8 +1,10 @@
+'use strict'
+
 const request = require('supertest')
 const util = require('util')
 const app = require('./app')
 
-default_headers = {
+const default_headers = {
     'x-endpoint-api-userinfo':
     'eyJpc3N1ZXIiOiJUT0tFTl9JU1NVRVIiLCJpZCI6Ikl3M0JtS2V6cjVoRWw5QUFIM2RkVm1IQWxzOTIiLCJlbWFpbCI6InRlbXBAZXhhbXBsZS5sb2NhbCJ9'
 }
@@ -36,8 +38,8 @@ describe('ProjectController', () => {
             .set(default_headers)
             .send({
                 members: [
-                    "ICXa2Dr4LeZTNyN9tv60pNXMjqC3",
-                    "QM9HKPoy9KffdUmP4JIWOem6zC93",
+                    'ICXa2Dr4LeZTNyN9tv60pNXMjqC3',
+                    'QM9HKPoy9KffdUmP4JIWOem6zC93',
                 ]
             })
         expect(res.statusCode).toEqual(200)
@@ -52,7 +54,7 @@ describe('ProjectController', () => {
     })
     it('Get all projects', async () => {
         res = await request(app)
-            .get(`/projects/`)
+            .get('/projects/')
             .set(default_headers)
             .send()
         expect(res.statusCode).toEqual(200)

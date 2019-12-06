@@ -1,3 +1,4 @@
+'use strict'
 module.exports = {
     'ProjectController': require('./ProjectController'),
     'TaskController': require('./TaskController'),

@@ -1,3 +1,4 @@
+'use strict'
 const Joi = require('@hapi/joi')
 
 // Google Endpoints doesn't provide full-fledged schema validation
