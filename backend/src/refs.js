@@ -11,7 +11,12 @@ const resolveRef = async (ref) => {
     return val
 }
 
-const getProjectAdmin = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}/admin`)
+const getProjectAdmin = async (projectId) => {
+    const res = await resolveRef(`${PROJECT_ROOT}/${projectId}/admin`)
+    log.debug(`Fetched project ${projectId} admin: ${JSON.stringify(res)}`)
+    return res
+}
+
 const getProjectMembers = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}/members`)
 const isGroupProject = async (projectId) => {
     const val = await resolveRef(`${PROJECT_ROOT}/${projectId}/type`)

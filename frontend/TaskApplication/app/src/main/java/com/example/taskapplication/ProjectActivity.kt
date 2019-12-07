@@ -268,6 +268,8 @@ class ProjectActivity : BaseActivity(),
             // The projectId of this project must be passed as
             // an extra from an Activity calling this activity.
             projectId = intent.extras?.getString("pid")!!
+            val projectName = intent.extras?.getString("name")!!
+            supportActionBar?.setTitle(projectName)
             val projectPath = database.child("projects").child(projectId)
             val tasksPath = projectPath.child("tasks")
             // The user is signed in, so fetch all tasks here, sorted by creation date.
