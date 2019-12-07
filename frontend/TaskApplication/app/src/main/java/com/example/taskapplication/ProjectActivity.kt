@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.CheckBox
 import android.widget.ListView
 import android.widget.Toast
@@ -13,7 +14,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import com.loopj.android.http.JsonHttpResponseHandler
+import com.loopj.android.http.RequestParams
+import cz.msebera.android.httpclient.Header
 import kotlinx.android.synthetic.main.activity_project.*
+import org.json.JSONObject
 
 class ProjectActivity : BaseActivity(), View.OnClickListener {
     // Declare an instance of Firebase Auth.
@@ -38,7 +43,15 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
         listView = projectTasksView
         taskAdapter = TasksCustomAdapter(applicationContext, taskEntries)
         listView.adapter = taskAdapter
-        // TODO: listView.onItemClickListener to toggle checkbox by clicking text?
+        listView.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, _, position, _ ->
+                // Update the status of a clicked task using our API.
+                Log.d(TAG, "position $position")
+                Log.d(TAG, "getItemAtPosition ${parent.getItemAtPosition(position)}")
+                val id = taskAdapter.getItem(position)!!.getValue("tid")
+                val st = taskAdapter.getItem(position)!!.getValue("status")
+                updateTask(id, st)
+            }
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
@@ -102,24 +115,53 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
         transaction.commit()
     }
 
-
     private fun createTask() {
         val intent = Intent(this, CreateTaskActivity::class.java)
         startActivity(intent)
     }
 
-    fun onCheckboxClicked(v: View) {
-        // Set these to false in order to send the click events to the parent Activity.
-        // v.isClickable = false
-        // v.isFocusable = false
-        if (v is CheckBox) {
-            if (v.isChecked) {
-                // TODO: The task was marked done, so cross out the text field and make it gray.
-                Log.d(TAG, "CHECKED")
+    private fun updateTask(tid: String, status: String) {
+        showProgressDialog()
+        // Update the status of the given task with our API.
+        val user = auth.currentUser
+        user!!.getIdToken(true).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val idToken = task.result!!.token
+                Log.d(TAG, "idToken $idToken")
+                val params = RequestParams()
+                Log.d(TAG, "----- 1 ----- params $params")
+                params.put("status", status)
+                Log.d(TAG, "----- 2 ----- params $params")
+                params.put("access_token", idToken) // Must be included to identify the user.
+                // PUT https://mcc-fall-2019-g09.appspot.com/task/<taskId>
+                APIClient.put("task/$tid", params, object : JsonHttpResponseHandler() {
+                    override fun onSuccess(
+                        statusCode: Int,
+                        headers: Array<out Header>?,
+                        response: JSONObject
+                    ) {
+                        // Called when response HTTP status is "200 OK".
+                        Log.d(TAG, "createProject:APIClient:onSuccess")
+                        updateUI(user)
+                    }
+                    override fun onFailure(
+                        statusCode: Int,
+                        headers: Array<out Header>?,
+                        responseString: String,
+                        error: Throwable?
+                    ) {
+                        // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
+                        Log.d(TAG, "createProject:APIClient:onFailure")
+                        Log.d(TAG, "statusCode $statusCode")
+                        Log.d(TAG, "headers ${headers?.forEach(::println)}")
+                        Log.d(TAG, "responseString $responseString")
+                        Log.d(TAG, "error $error")
+                    }
+                })
             } else {
-                // TODO: The task was marked undone, so make the text field normal again.
-                Log.d(TAG, "NOT CHECKED")
+                // Handle error -> task.getException();
             }
+            hideProgressDialog()
         }
     }
 
@@ -130,7 +172,6 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
         while (updatingTaskList) { }
         updatingTaskList = true
         taskEntries.clear()
-        // val taskMap = arrayListOf<Map<String, String>>()
         tasks.children.forEach {
             val tid = it.key.toString()
             val description = it.child("description").value.toString()

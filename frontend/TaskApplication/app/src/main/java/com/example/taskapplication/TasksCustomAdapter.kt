@@ -34,6 +34,9 @@ class TasksCustomAdapter(applicationContext: Context,
         val checkBoxView = returnedView!!.projectTaskCheckBox
         val task = ts[position]
         checkBoxView.text = task.getValue("description")
+        // Mark the checkbox with a tick mark only if it is marked complete.
+        // Otherwise, remove the tick mark.
+        checkBoxView.isChecked = task.getValue("status") == "completed"
         return returnedView
     }
 

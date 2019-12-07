@@ -16,7 +16,6 @@
         android:textSize="15sp"
         android:textColor="#000"
         android:clickable="false"
-        android:focusable="false"
-        android:onClick="onCheckboxClicked"/>
+        android:focusable="false" />
 
 </LinearLayout>
