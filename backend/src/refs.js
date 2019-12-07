@@ -27,7 +27,7 @@ const getProject = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}`)
 
 const belongsToProject = async (userId, projectId) => {
     const { admin, members } = await getProject(projectId)
-    return admin === userId || members.find(member => member === userId)
+    return admin === userId || (members || []).find(member => member === userId)
 }
 
 const notBelongsToProject = async (userId, projectId) => !(await belongsToProject(userId, projectId))
