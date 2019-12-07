@@ -35,8 +35,9 @@ describe('ProjectController', () => {
             })
         expect(res.statusCode).toEqual(201)
         expect(res.body).toHaveProperty('project_id')
-        project_id = res.project_id
+        project_id = res.body.project_id
     })
+
     it.skip('Get project attachments', async () => {
         res = await request(app)
             .get(`/project/${project_id}/attachments`)
