@@ -88,14 +88,17 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                 Toast.LENGTH_LONG).show()
             return
         }
+
         val currentDate = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
         val date = currentDate.format(formatter)
 
         var keywords = listOf<String>()
         try {
-            val input = editTextName.text.toString()
-            if (!input.matches(("^[a-zA-Z0-9]+$").toRegex())) { // It's not working...
+            val input = et_project_keywords.text.toString()
+            val regex = """^[a-zA-Z0-9\s]+$""".toRegex()
+
+            if (!input.matches(regex)) {
                 Toast.makeText(this,
                     "Only alphanumeric characters allowed in keywords. Use space as delimiter.",
                     Toast.LENGTH_LONG).show()
@@ -104,7 +107,6 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
             keywords = input.split(" ", limit = 3)
         } catch (e: Exception) {
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show()
-            //
         }
 
         var imageB64:String? = null
@@ -134,6 +136,9 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                               keywords: List<String>,
                               imageB64: String?,
                               projectType: String) {
+
+        Log.d(TAG, String.format("createProject(%s, %s, %s, %s, %s)", name, description, date.toString(), keywords, projectType))
+
         showProgressDialog()
         // Create a project with our API which returns the new project ID.
         val user = auth.currentUser
