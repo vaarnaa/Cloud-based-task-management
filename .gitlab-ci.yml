@@ -40,7 +40,7 @@ frontend:
   script:
     - cd frontend/TaskApplication/
     - ./gradlew check assemble
-    - mv app/build/outputs/*/*.apk /
+    - mv app/build/outputs/apk/*/*.apk ../../
   artifacts:
     paths:
-      - "/*.apk"
+      - "*.apk"
