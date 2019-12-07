@@ -1,4 +1,5 @@
 'use strict'
+const admin = require('firebase-admin');
 
 const common = {
     version: '0.0.1',
@@ -12,6 +13,7 @@ const common = {
     // 4. Copy the contents below
     // firebase: {},
     firebase: {
+        credential: admin.credential.applicationDefault(),
         apiKey: 'AIzaSyAwshnihuiKH3-31zXcGlXNbsU8d6BJ3zI',
         authDomain: 'mcc-fall-2019-g09.firebaseapp.com',
         databaseURL: 'https://mcc-fall-2019-g09.firebaseio.com',
