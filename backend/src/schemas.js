@@ -5,13 +5,13 @@ const Joi = require('@hapi/joi')
 // https://cloud.google.com/endpoints/docs/openapi/openapi-limitations
 // so should validate on our end
 
-/*
+
 const user = Joi.object({
     id: Joi.string().required(),
 })
-*/
 
-const userId = Joi.string().required()
+
+// const userId = Joi.string().required()
 
 const taskStatus =
   Joi.string().valid('pending', 'on-going', 'completed')
@@ -38,24 +38,19 @@ const taskStatusBody = Joi.object({
     taskStatus: taskStatus.required(),
 })
 
-const usersBody = Joi.object({
-    users: Joi.array().items(userId).required(),
-})
-
 const membersBody = Joi.object({
     // "it can contain one or more users"
-    members: Joi.array().items(userId).min(1).required(),
+    members: Joi.array().items(user).min(1).required(),
 })
 
 const assignTaskBody = Joi.object({
-    assignments: Joi.array().items(userId).required(),
+    assignments: Joi.array().items(user).required(),
 })
 
 module.exports = {
     projectBody,
     taskAttributesBody,
     taskStatusBody,
-    usersBody,
     assignTaskBody,
     membersBody,
 }
