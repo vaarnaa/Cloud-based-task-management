@@ -37,18 +37,19 @@
     <string name="profile_image_url">Profile image URL</string>
     <string name="project_description">Description</string>
     <string name="project_name">Name</string>
-    <string name="create_project">create project</string>
-    <string name="create_task">create task</string>
+    <string name="create_project">Create project</string>
+    <string name="create_task">Create task</string>
     <string name="add_icon">Add icon</string>
-    <string name="project_deadline">Deadline</string>
+    <string name="deadline">Deadline</string>
     <string name="project_deadline_time">dd-mm-yyyy 00:00:00</string>
-    <string name="set_project_deadline">set</string>
+    <string name="set">Set</string>
     <string name="project_keywords">Add keywords</string>
     <string name="radio_personal">Personal</string>
     <string name="radio_group">Group</string>
     <string name="change_imgQ">Change image quality</string>
     <string name="image_quality">Image quality</string>
     <string name="projects_list_modified_text">Modified: %s</string>
+    <string name="task_description">Task description</string>
     <string-array name="image_quality_array">
         <item>Full (original size)</item>
         <item>High (1280x960 px)</item>

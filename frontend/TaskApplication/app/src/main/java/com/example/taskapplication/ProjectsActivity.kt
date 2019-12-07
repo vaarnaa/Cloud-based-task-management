@@ -43,8 +43,10 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
                 Log.d(TAG, "position $position")
                 Log.d(TAG, "getItemAtPosition ${parent.getItemAtPosition(position)}")
                 val pid = customAdapter.getItem(position)!!.getValue("pid")
+                val name = customAdapter.getItem(position)!!.getValue("name")
                 val intent = Intent(this, ProjectActivity::class.java)
                 intent.putExtra("pid", pid)
+                intent.putExtra("name", name)
                 startActivity(intent)
             }
         // Initialize Firebase instances.
