@@ -32,5 +32,8 @@ rules:
   strict:
     - error
     - global
+  no-unused-vars:
+    - error
+    - argsIgnorePattern: next
   jest/no-disabled-tests:
     - off

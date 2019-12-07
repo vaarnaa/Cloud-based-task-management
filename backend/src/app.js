@@ -48,9 +48,9 @@ app.get('/', (req, res) => {
 })
 
 // Project related
-app.get('/projects/', ctrls.ProjectController.getAll);
+app.get('/projects/', ctrls.ProjectController.getAll)
 app.post('/project/', ctrls.ProjectController.createProject)
-app.get('/project/:project_id', ctrls.ProjectController.getSingle);
+app.get('/project/:project_id', ctrls.ProjectController.getSingle)
 app.delete('/project/:project_id', ctrls.ProjectController.deleteProject)
 
 // User/member related
@@ -77,7 +77,7 @@ app.use(function (req, res) {
 app.use(function (err, req, res, next) {
     if (env.debug) log.error(err.stack)
     let code = 500
-    if (err.code === "PERMISSION_DENIED") code = 403
+    if (err.code === 'PERMISSION_DENIED') code = 403
     res.status(code).send({code, message: err.message})
 })
 

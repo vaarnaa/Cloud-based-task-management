@@ -15,42 +15,28 @@ const projectNotFoundResponse = () => ({
 })
 
 const ProjectController = {
-/*
-  // Get a project
-  // GET /projects/{id}
-  getSingle(req, res) {
-    log.debug("ProjectController.getSingle");
-
-    // TODO: ensure user has access to this project!
-
-    database.ref(`${ref_root}/${req.params.project_id}`).once('value')
-      .then(snapshot => {
-        const project = snapshot.val()
-        log.debug(project);
-        res.status(200).json(project);
-      })
-      .catch(err => {
-        const msg = `Failed: ${errorObject.code}`;
-        log.error(msg);
-        res.status(400).json({ msg });
-      });
-  },
-*/
-    /*
-  // Get all projects user has access to
-  getAll(req, res) {
-    log.debug("ProjectController.getAll");
-
-    const projects = database.ref().child(ref_root).once('value')
-    .then(data => {
-      // TODO: filter!
-      res.status(200).json({ status: 'ok', data });
-    })
-    .catch(err => {
-
-    });
-  },
-*/
+    // GET /projects/{id}
+    async getSingle(req, res) {
+        log.debug('ProjectController.getSingle')
+        // TODO: ensure user has access to this project!
+        try {
+            const snapshot = await database.ref(`${ref_root}/${req.params.project_id}`).once('value')
+            const project = snapshot.val()
+            log.debug(project)
+            return res.status(200).json(project)
+        } catch (e) {
+            const msg = `Failed: ${e.code}`
+            log.error(msg)
+            return res.status(400).json({code: 400, message: msg})
+        }
+    },
+    // Get all projects user has access to
+    async getAll(req, res) {
+        log.debug('ProjectController.getAll')
+        const projects = await database.ref().child(ref_root).once('value')
+        // TODO: filter by user has access to this project!
+        return res.status(200).json({ status: 'ok', projects })
+    },
     // Create project
     // POST /project/{id}
     async createProject(req, res) {
