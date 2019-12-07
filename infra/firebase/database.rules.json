@@ -1,0 +1,43 @@
+{
+  "rules": {
+    "projects": {
+      "$pid": {
+        // TODO: Check for auth !== null before auth.uid to prevent bugs.
+        ".read": true,
+        ".write": true
+      }
+    },
+    // Keep track of created usernames and uids to ensure uniqueness.
+    "usernames": {
+      ".read": true,
+      // Allow creating, but not changing or deleting, usernames.
+      "$username": {
+        // Prevent changing the uid.
+        ".write": "!data.exists()",
+      	".validate": "newData.isString()"
+      }
+    },
+    // User profile settings.
+    "users": {
+      "$uid": {
+        // Users can only read and write their own profile information.
+        ".read": "auth !== null && auth.uid === $uid",
+        ".write": "auth !== null && auth.uid === $uid",
+        "username": {
+          // Prevent changing the username, and it must exist in /usernames.
+          ".validate": "!data.exists() &&
+            root.child('usernames').child(newData.val()).exists() &&
+            root.child('usernames').child(newData.val()).val() === $uid"
+        },
+      	// User-preferred image quality for uploading and downloading.
+        "imageQuality": { ".validate": "newData.exists()" },
+        // Project IDs of projects that this user is a member of.
+        "projects": {
+          "$pid": { ".validate": true }
+        },
+        // No other fields can be included in a user profile.
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}
