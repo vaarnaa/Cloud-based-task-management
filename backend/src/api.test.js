@@ -45,7 +45,7 @@ describe('ProjectController', () => {
         expect(res.statusCode).toEqual(200)
         expect(res.body.name).toEqual('project_name1')
     })
-    it.skip('Add members', async () => {
+    it('Add members', async () => {
         res = await request(app)
             .put(`/project/${project_id}/members/`)
             .set(default_headers)
@@ -57,7 +57,7 @@ describe('ProjectController', () => {
             })
         expect(res.statusCode).toEqual(200)
     })
-    it.skip('Get that project', async () => {
+    it('Get that project', async () => {
         res = await request(app)
             .get(`/project/${project_id}`)
             .set(default_headers)
@@ -65,7 +65,7 @@ describe('ProjectController', () => {
         expect(res.statusCode).toEqual(200)
         expect(res.body.name).toEqual('project_name1')
     })
-    it.skip('Get all projects', async () => {
+    it('Get all projects', async () => {
         res = await request(app)
             .get('/projects/')
             .set(default_headers)
@@ -73,7 +73,7 @@ describe('ProjectController', () => {
         expect(res.statusCode).toEqual(200)
     })
 
-    it.skip('Delete project', async () => {
+    it('Delete project', async () => {
         res = await request(app)
             .delete(`/project/${project_id}`)
             .set(default_headers)
@@ -81,6 +81,9 @@ describe('ProjectController', () => {
         expect(res.statusCode).toEqual(200)
     })
     afterEach(() => {
-        if (res.body.message) console.log(util.inspect(res.body.message, {depth: 10}))
+        if (res && res.body && res.body.message) {
+            console.log(util.inspect(res.body.message, {depth: 10}))
+        }
+        res = undefined
     })
 })
