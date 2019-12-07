@@ -1,5 +1,5 @@
 'use strict'
-const admin = require('firebase-admin');
+const admin = require('firebase-admin')
 
 const common = {
     version: '0.0.1',
