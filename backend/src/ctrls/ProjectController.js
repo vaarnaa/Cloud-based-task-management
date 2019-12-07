@@ -66,6 +66,7 @@ const ProjectController = {
             admin: req.auth_user.id,
             type: value.type,
             created: new Date(),
+            modified: new Date(),
             deadline: value.deadline && new Date(value.deadline) || null,
             badge: value.badge || null, // url to image
             tasks: { },

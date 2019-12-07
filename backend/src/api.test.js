@@ -1,5 +1,7 @@
 'use strict'
 
+//process.env.NODE_ENV = 'development'
+
 const request = require('supertest')
 const util = require('util')
 const app = require('./app')
@@ -45,12 +47,12 @@ describe('ProjectController', () => {
     })
     it.skip('Add members', async () => {
         res = await request(app)
-            .post(`/project/${project_id}/members/`)
+            .put(`/project/${project_id}/members/`)
             .set(default_headers)
             .send({
                 members: [
-                    'ICXa2Dr4LeZTNyN9tv60pNXMjqC3',
-                    'QM9HKPoy9KffdUmP4JIWOem6zC93',
+                    { id: 'ICXa2Dr4LeZTNyN9tv60pNXMjqC3' },
+                    { id: 'QM9HKPoy9KffdUmP4JIWOem6zC93' },
                 ]
             })
         expect(res.statusCode).toEqual(200)
@@ -76,7 +78,7 @@ describe('ProjectController', () => {
             .delete(`/project/${project_id}`)
             .set(default_headers)
             .send()
-        expect(res.statusCode).toEqual(204)
+        expect(res.statusCode).toEqual(200)
     })
     afterEach(() => {
         if (res.body.message) console.log(util.inspect(res.body.message, {depth: 10}))
