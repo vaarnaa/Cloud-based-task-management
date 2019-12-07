@@ -14,18 +14,19 @@ const { invalidInput } = require('../errors')
 const log = require('../log')
 
 const taskEvents = {
-    assignment: 'assignment',
-    creation: 'creation',
-    updateStatus: 'status change'
+    assignment: 'task assignment',
+    creation: 'task creation',
+    updateStatus: 'task status change'
 }
 
-const generateEventsUpdates = (projectId, taskEvent, input) => {
+const generateEventsUpdates = (projectId, taskId, taskEvent, input) => {
     const rootRef = `${PROJECT_ROOT}/${projectId}/events`
     const eventId = database.ref().child(rootRef).push().key
     const event = {
         created: new Date(),
-        taskEvent,
+        'event': taskEvent,
         input,
+        taskId,
     }
     const updates = { [`${rootRef}/${eventId}`]: event }
     return updates
@@ -64,7 +65,7 @@ const TaskController = {
         await Promise.all([
             await database.ref().update({
                 ...updates,
-                ...generateEventsUpdates(req.params.project_id, taskEvents.creation, task),
+                ...generateEventsUpdates(req.params.project_id, taskId, taskEvents.creation, task),
             }),
             setModifiedToNow(req.params.project_id),
         ])
@@ -99,7 +100,9 @@ const TaskController = {
 
         await Promise.all([
             // TODO: run in transaction?
-            await database.ref().update(generateEventsUpdates(req.params.project_id, taskEvents.assignment, value)),
+            await database.ref().update(
+                generateEventsUpdates(req.params.project_id, req.params.task_id, taskEvents.assignment, value)
+            ),
             setModifiedToNow(req.params.project_id),
         ])
 
@@ -126,7 +129,9 @@ const TaskController = {
 
         await Promise.all([
             // TODO: run in transaction?
-            await database.ref().update(generateEventsUpdates(req.params.project_id, taskEvents.updateStatus, value)),
+            await database.ref().update(
+                generateEventsUpdates(req.params.project_id, req.params.task_id, taskEvents.updateStatus, value)
+            ),
             setModifiedToNow(req.params.project_id),
         ])
         log.debug(`TaskController.updateTask: updated ${req.params.task_id} with: ${JSON.stringify(data)}`)
