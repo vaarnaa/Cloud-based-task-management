@@ -48,9 +48,9 @@ app.get('/', (req, res) => {
 })
 
 // Project related
-// app.get('/projects/', ctrls.ProjectController.getAll);
+app.get('/projects/', ctrls.ProjectController.getAll);
 app.post('/project/', ctrls.ProjectController.createProject)
-// app.get('/project/:project_id', ctrls.ProjectController.getSingle);
+app.get('/project/:project_id', ctrls.ProjectController.getSingle);
 app.delete('/project/:project_id', ctrls.ProjectController.deleteProject)
 
 // User/member related
@@ -70,15 +70,15 @@ app.put('/project/:project_id/task/:task_id/assignments', ctrls.TaskController.a
 
 // Generic
 
-app.use(function (req, res)
-{
-    res.status(404).send('ERROR 404: Sorry can\'t find that!')
+app.use(function (req, res) {
+    res.status(404).send({code: 404, message: `NotFound: ${req.path} is not implemented on this API`})
 })
 
-app.use(function (err, req, res)
-{
-    log.error(err.stack)
-    res.status(500).send('ERROR 500: Something broke!')
+app.use(function (err, req, res, next) {
+    if (env.debug) log.error(err.stack)
+    let code = 500
+    if (err.code === "PERMISSION_DENIED") code = 403
+    res.status(code).send({code, message: err.message})
 })
 
 if (env.port !== undefined) {
