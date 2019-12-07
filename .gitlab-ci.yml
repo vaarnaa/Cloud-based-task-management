@@ -21,7 +21,7 @@ jest:
 
 pages:
   image: alpine
-  stage: deploy
+  stage: build   # not "deploy" to allow running concurrently with Android build
   script:
     - apk add curl
     - cd backend/coverage
@@ -29,3 +29,14 @@ pages:
     - curl https://mcc.zi.fi/mccproject -X POST -T lcov-report.tar
   only:
     - master
+
+frontend:
+  image: mreichelt/android:29
+  stage: build
+  script:
+    - cd frontend/TaskApplication/
+    - ./gradlew check assemble
+    - mv app/build/outputs/*/*.apk /
+  artifacts:
+    paths:
+      - "/*.apk"
