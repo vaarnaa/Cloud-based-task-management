@@ -249,13 +249,13 @@ paths:
       operationId: "updateTask"
       description: "Updates task status"
       parameters:
-      - name: "taskStatus"
+      - name: "status"
         in: "body"
         required: true
         schema:
           type: "object"
           required:
-          - "taskStatus"
+          - "status"
           properties:
             taskStatus:
               $ref: "#/definitions/taskStatus"

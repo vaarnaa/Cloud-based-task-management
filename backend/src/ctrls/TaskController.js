@@ -12,6 +12,25 @@ const {
 const { invalidInput } = require('../errors')
 const log = require('../log')
 
+const taskEvents = {
+    assignment: 'assignment',
+    creation: 'creation',
+    updateStatus: 'status change'
+}
+
+const generateEventsUpdates = (projectId, taskEvent, input) => {
+    const rootRef = `${PROJECT_ROOT}/${projectId}/events`
+    const eventId = database.ref().child(rootRef).push().key
+    const event = {
+        created: new Date(),
+        taskEvent,
+        input,
+    }
+    const updates = { [`${rootRef}/${eventId}`]: event }
+    return updates
+    // await database.ref().update(updates)
+}
+
 const TaskController = {
 
     // Create a new task in project
@@ -41,7 +60,11 @@ const TaskController = {
         const taskId = database.ref().child(rootRef).push().key
         const updates = { [`${rootRef}/${taskId}`]: task }
 
-        await database.ref().update(updates)
+        await database.ref().update({
+            ...updates,
+            ...generateEventsUpdates(req.params.project_id, taskEvents.creation, task),
+        })
+
 
         log.debug(`TaskController.createTask: created: ${taskId} with: ${JSON.stringify(updates)}`)
         res.status(201).json({ task_id: taskId })
@@ -69,6 +92,10 @@ const TaskController = {
         const data = await database.ref(`${taskRef}/assignments`).set(
             value.assignments.map(assignment => assignment.id)
         )
+
+        // TODO: run in transaction?
+        await database.ref().update(generateEventsUpdates(req.params.project_id, taskEvents.assignment, value))
+
         log.debug(`TaskController.assignTask: updated ${req.params.task_id} with: ${JSON.stringify(data)}`)
         res.status(200).json({ taskId: req.params.task_id, assignments: value.assignments })
     },
@@ -88,9 +115,11 @@ const TaskController = {
         }
 
         const taskRef = `${PROJECT_ROOT}/${req.params.project_id}/tasks/${req.params.task_id}`
-        const data = await database.ref(`${taskRef}/taskStatus`).set(value.taskStatus)
+        const data = await database.ref(`${taskRef}/status`).set(value.status)
+        // TODO: run in transaction?
+        await database.ref().update(generateEventsUpdates(req.params.project_id, taskEvents.updateStatus, value))
         log.debug(`TaskController.updateTask: updated ${req.params.task_id} with: ${JSON.stringify(data)}`)
-        res.status(200).json({ taskId: req.params.task_id, taskStatus: value.taskStatus })
+        res.status(200).json({ taskId: req.params.task_id, status: value.status })
     },
 
 /*

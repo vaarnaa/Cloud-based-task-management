@@ -35,7 +35,7 @@ const taskAttributesBody = Joi.object({
 })
 
 const taskStatusBody = Joi.object({
-    taskStatus: taskStatus.required(),
+    status: taskStatus.required(),
 })
 
 const membersBody = Joi.object({
