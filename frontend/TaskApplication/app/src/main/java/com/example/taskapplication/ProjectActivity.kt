@@ -15,8 +15,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
 import com.loopj.android.http.JsonHttpResponseHandler
-import com.loopj.android.http.RequestParams
 import cz.msebera.android.httpclient.Header
+import cz.msebera.android.httpclient.entity.ContentType
+import cz.msebera.android.httpclient.entity.StringEntity
 import kotlinx.android.synthetic.main.activity_project.*
 import org.json.JSONObject
 
@@ -145,51 +146,57 @@ class ProjectActivity : BaseActivity(),
         val user = auth.currentUser
         user!!.getIdToken(true).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val idToken = task.result!!.token
+                val idToken = task.result!!.token!!
                 Log.d(TAG, "idToken $idToken")
-                val params = RequestParams()
-                Log.d(TAG, "----- 1 ----- params $params")
-                params.put("status", status)
-                Log.d(TAG, "----- 2 ----- params $params")
-                params.put("access_token", idToken) // Must be included to identify the user.
+                val jsonParams = JSONObject()
+                Log.d(TAG, "----- 1 ----- params $jsonParams")
+                jsonParams.put("status", status)
+                Log.d(TAG, "----- 2 ----- params $jsonParams")
+                val entity = StringEntity(jsonParams.toString())
                 // PUT https://mcc-fall-2019-g09.appspot.com/task/<taskId>
-                APIClient.put("task/$tid", params, object : JsonHttpResponseHandler() {
-                    override fun onSuccess(
-                        statusCode: Int,
-                        headers: Array<out Header>?,
-                        response: JSONObject
-                    ) {
-                        // Called when response HTTP status is "200 OK".
-                        Log.d(TAG, "createProject:APIClient:onSuccess")
-                        updateUI(user)
-                    }
-                    override fun onFailure(
-                        statusCode: Int,
-                        headers: Array<out Header>?,
-                        responseString: String,
-                        error: Throwable?
-                    ) {
-                        // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
-                        Log.d(TAG, "createProject:APIClient:onFailure")
-                        Log.d(TAG, "statusCode $statusCode")
-                        Log.d(TAG, "headers ${headers?.forEach(::println)}")
-                        Log.d(TAG, "responseString $responseString")
-                        Log.d(TAG, "error $error")
-                    }
-                    override fun onFailure(
-                        statusCode: Int,
-                        headers: Array<out Header>?,
-                        error: Throwable?,
-                        data: JSONObject
-                    ) {
-                        // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
-                        Log.d(TAG, "createProject:APIClient:onFailure")
-                        Log.d(TAG, "statusCode $statusCode")
-                        Log.d(TAG, "headers ${headers?.forEach(::println)}")
-                        Log.d(TAG, "data $data")
-                        Log.d(TAG, "error $error")
-                    }
-                })
+                APIClient.put(
+                    applicationContext,
+                    "task/$tid",
+                    idToken,
+                    entity,
+                    ContentType.APPLICATION_JSON.mimeType,
+                    object : JsonHttpResponseHandler() {
+                        override fun onSuccess(
+                            statusCode: Int,
+                            headers: Array<out Header>?,
+                            response: JSONObject
+                        ) {
+                            // Called when response HTTP status is "200 OK".
+                            Log.d(TAG, "createProject:APIClient:onSuccess")
+                            updateUI(user)
+                        }
+                        override fun onFailure(
+                            statusCode: Int,
+                            headers: Array<out Header>?,
+                            responseString: String,
+                            error: Throwable?
+                        ) {
+                            // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
+                            Log.d(TAG, "createProject:APIClient:onFailure")
+                            Log.d(TAG, "statusCode $statusCode")
+                            Log.d(TAG, "headers ${headers?.forEach(::println)}")
+                            Log.d(TAG, "responseString $responseString")
+                            Log.d(TAG, "error $error")
+                        }
+                        override fun onFailure(
+                            statusCode: Int,
+                            headers: Array<out Header>?,
+                            error: Throwable?,
+                            data: JSONObject
+                        ) {
+                            // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
+                            Log.d(TAG, "createProject:APIClient:onFailure")
+                            Log.d(TAG, "statusCode $statusCode")
+                            Log.d(TAG, "headers ${headers?.forEach(::println)}")
+                            Log.d(TAG, "data $data")
+                            Log.d(TAG, "error $error")
+                        }
+                    })
             } else {
                 // Handle error -> task.getException();
             }

@@ -19,8 +19,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.loopj.android.http.JsonHttpResponseHandler
-import com.loopj.android.http.RequestParams
 import cz.msebera.android.httpclient.Header
+import cz.msebera.android.httpclient.entity.ContentType
+import cz.msebera.android.httpclient.entity.StringEntity
 import kotlinx.android.synthetic.main.activity_create_project.*
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -89,6 +90,7 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
             return
         }
 
+        // TODO: Does not use the given deadline date yet.
         val currentDate = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")
         val date = currentDate.format(formatter)
@@ -125,105 +127,88 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
         val selectedRadioId = radioButtons.getCheckedRadioButtonId()
         // find the selected radiobutton by id
         val radioButton = findViewById<View>(selectedRadioId) as RadioButton
-        val projectType = radioButton.text.toString()
+        val projectType = radioButton.text.toString().toLowerCase(Locale.ENGLISH)
 
         createProject(name, description, currentDate, keywords, imageB64, projectType)
     }
 
     private fun createProject(name: String,
                               description: String,
-                              date: LocalDateTime,
+                              deadline: LocalDateTime,
                               keywords: List<String>,
                               imageB64: String?,
                               projectType: String) {
-
-        Log.d(TAG, String.format("createProject(%s, %s, %s, %s, %s)", name, description, date.toString(), keywords, projectType))
-
+        Log.d(TAG, String.format("createProject(%s, %s, %s, %s, %s)", name, description,
+            deadline.toString(), keywords, projectType))
         showProgressDialog()
         // Create a project with our API which returns the new project ID.
         val user = auth.currentUser
         user!!.getIdToken(true).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                val idToken = task.result!!.token
+                val idToken = task.result!!.token!!
                 Log.d(TAG, "idToken $idToken")
-                val params = RequestParams()
-                Log.d(TAG, "----- 1 ----- params $params")
-                params.put("name", name)
-                params.put("description", description)
-                params.put("date", date)
-                Log.d(TAG, "----- 2 ----- params $params")
-                params.put("access_token", idToken) // Must be included to identify the user.
-                // params.put("keywords", keywords)
-                // params.put("projectType", projectType)
-                /* Structure is:
-                    projectId: {
-                        admin: userId
-                        badge: badgeUrl (in Firebase Storage),
-                        created: "Tue, 3 Dec 2019 07:00:00 GMT",
-                        deadline: "Wed, 14 Jun 2020 07:00:00 GMT",
-                        description: description,
-                        name: projectName,
-                        keywords: {
-                            keyword1: "",
-                            keyword2: "",
-                            keyword3: ""
-                        },
-                        members: {
-                            userId1: username1,
-                            userId2: username2,
-                            ...
-                        }
-                    }
-                 */
+                val requestBody = mapOf(
+                    "name" to name,
+                    "description" to description,
+                    "deadline" to deadline,
+                    "keywords" to keywords,
+                    "type" to projectType
+                )
+                Log.d(TAG, "---------- requestBody $requestBody")
+                val jsonParams = JSONObject(requestBody)
+                Log.d(TAG, "---------- jsonParams $jsonParams")
+                val entity = StringEntity(jsonParams.toString())
+                Log.d(TAG, "---------- entity $entity")
                 // POST https://mcc-fall-2019-g09.appspot.com/project
-                APIClient.post("project", params, object : JsonHttpResponseHandler() {
-                    override fun onSuccess(
-                        statusCode: Int,
-                        headers: Array<out Header>?,
-                        response: JSONObject
-                    ) {
-                        // Called when response HTTP status is "200 OK".
-                        Log.d(TAG, "createProject:APIClient:onSuccess")
-                        // Add the received project ID to this user's projects.
-                        val pid = response.getString("id")
-                        database.child("users")
-                            .child(auth.uid!!)
-                            .child("projects")
-                            .child(pid)
-                            .setValue("")
-                            .addOnSuccessListener { successRedirect() }
-                    }
-                    override fun onFailure(
-                        statusCode: Int,
-                        headers: Array<out Header>?,
-                        responseString: String,
-                        error: Throwable?
-                    ) {
-                        // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
-                        Log.d(TAG, "createProject:APIClient:onFailure")
-                        Log.d(TAG, "statusCode $statusCode")
-                        Log.d(TAG, "headers ${headers?.forEach(::println)}")
-                        Log.d(TAG, "responseString $responseString")
-                        Log.d(TAG, "error $error")
-                    }
-                    override fun onFailure(
-                        statusCode: Int,
-                        headers: Array<out Header>?,
-                        error: Throwable?,
-                        data: JSONObject
-                    ) {
-                        // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
-                        Log.d(TAG, "createProject:APIClient:onFailure")
-                        Log.d(TAG, "statusCode $statusCode")
-                        headers?.forEach(::println) // NB, these are printed with `System.out` tag
-                        Log.d(TAG, "response data: ${data.toString()}}")
-                        Log.d(TAG, "error $error")
-                    }
-                })
+                APIClient.post(
+                    applicationContext,
+                    "project",
+                    idToken,
+                    entity,
+                    ContentType.APPLICATION_JSON.mimeType,
+                    object : JsonHttpResponseHandler() {
+                        override fun onSuccess(
+                            statusCode: Int,
+                            headers: Array<out Header>?,
+                            response: JSONObject
+                        ) {
+                            // Called when response HTTP status is "200 OK".
+                            Log.d(TAG, "createProject:APIClient:onSuccess")
+                            // Add the received project ID to this user's projects.
+                            val pid = response.getString("project_id")
+                            database.child("users")
+                                .child(auth.uid!!)
+                                .child("projects")
+                                .child(pid)
+                                .setValue("")
+                                .addOnSuccessListener { successRedirect() }
+                            // TODO: (TEMPORARY) This should be done in the backend.
+                            // Add the `modified` key to the project in the database.
+                            val modified = LocalDateTime.now().toString()
+                            database.child("projects")
+                                .child(pid)
+                                .child("modified")
+                                .setValue(modified)
+                        }
+                        override fun onFailure(
+                            statusCode: Int,
+                            headers: Array<out Header>?,
+                            error: Throwable?,
+                            data: JSONObject
+                        ) {
+                            // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
+                            Log.d(TAG, "createProject:APIClient:onFailure")
+                            Log.d(TAG, "statusCode $statusCode")
+                            // NB, these are printed with `System.out` tag
+                            headers?.forEach(::println)
+                            Log.d(TAG, "response data: ${data.toString(2)}")
+                            Log.d(TAG, "error $error")
+                        }
+                    })
             } else {
-                // Handle error -> task.getException();
-
-                Log.w(TAG, String.format("user id get was not successful: %s", task.exception.toString()))
+                // Handle error -> task.getException()
+                Log.w(TAG, String.format("user id get was not successful: %s",
+                    task.exception.toString()))
             }
             hideProgressDialog()
         }
