@@ -46,8 +46,7 @@ definitions:
     - "id"
     properties:
       id:
-        type: "integer"
-        format: "int32"
+        type: "string"
   members: # Wrap members array inside a members object since endpoints doesn't allow having an array itself as request body
     type: "object"
     required:
@@ -62,13 +61,13 @@ definitions:
     type: "object"
     required:
     - description
-    - status
     - deadline
     properties:
       description:
         type: "string"
       status:
         $ref: "#/definitions/taskStatus"
+        default: "pending"
       deadline:
         type: "string"
         format: "date-time"
@@ -78,7 +77,7 @@ definitions:
     - "pending"
     - "on-going"
     - "completed"
-  users:
+  assignments:
     type: "object"
     required:
     - users
@@ -89,6 +88,30 @@ definitions:
           $ref: "#/definitions/user"
   project:
     type: "object"
+    required:
+    - "name"
+    - "type"
+    - "description"
+    properties:
+      name:
+        type: "string"
+      type:
+        type: "string"
+        enum:
+        - "personal"
+        - "group"
+      description:
+        type: "string"
+      deadline:
+        type: "string"
+        format: "date-time"
+      badge:
+        type: "string"
+      keywords:
+        type: "array"
+        maxItems: 3
+        items:
+          type: "string"
 
 paths:
   /project:
@@ -107,9 +130,9 @@ paths:
           schema:
             type: "object"
             required:
-            - "id"
+            - "project_id"
             properties:
-              id:
+              project_id:
                 type: string
         '422':
           description: "Malformed input"
@@ -128,11 +151,11 @@ paths:
           description: "Project deleted"
           schema:
             type: "object"
-            required:
-            - "id"
-            properties:
-              id:
-                type: string
+      #      required:
+      #      - "id"
+      #      properties:
+      #        id:
+      #          type: string
         '404':
           description: "Project not found"
           schema:
@@ -160,14 +183,14 @@ paths:
           description: "Members added"
           schema:
             type: "object"
-            required:
-            - projectId
-            - members
-            properties:
-              projectId:
-                type: string
-              members:
-                $ref: "#/definitions/members"
+            #required:
+            #- projectId
+            #- members
+            #properties:
+          #    projectId:
+          #      type: string
+          #    members:
+          #      $ref: "#/definitions/members"
         '404':
           description: "Project not found"
           schema:
@@ -200,10 +223,14 @@ paths:
           schema:
             type: "object"
             required:
-            - "taskId"
+            - "task_id"
             properties:
-              taskId:
+              task_id:
                 type: "string"
+        '403':
+          description: "Insufficient permissions"
+          schema:
+            $ref: "#/definitions/error"
         '404':
           description: "Project not found"
           schema:
@@ -226,24 +253,33 @@ paths:
         in: "body"
         required: true
         schema:
-          $ref: "#/definitions/taskStatus"
+          type: "object"
+          required:
+          - "taskStatus"
+          properties:
+            taskStatus:
+              $ref: "#/definitions/taskStatus"
       responses:
         '200':
           description: "Task status updated"
           schema:
             type: "object"
-            required:
-            - taskStatus
-            - taskId
-            properties:
-              taskStatus:
-                $ref: "#/definitions/taskStatus"
-              taskId:
-                type: string
-        '404':
-          description: "Task not found"
+            #required:
+            #- taskStatus
+            #- taskId
+            #properties:
+          #    taskStatus:
+          #      $ref: "#/definitions/taskStatus"
+          #    taskId:
+          #      type: string
+        '403':
+          description: "Insufficient permissions"
           schema:
             $ref: "#/definitions/error"
+        #'404':
+        #  description: "Task not found"
+        #  schema:
+        #    $ref: "#/definitions/error"
         '422':
           description: "Malformed input"
           schema:
@@ -258,31 +294,35 @@ paths:
       operationId: "assignTask"
       description: "Assign task to user(s)"
       parameters:
-      - name: "users"
+      - name: "assignments"
         in: "body"
         required: true
         schema:
-          $ref: "#/definitions/users"
+          $ref: "#/definitions/assignments"
       responses:
         '200':
           description: "Task assigned successfully"
           schema:
             type: "object"
-            required:
-            - "projectId"
-            - "taskId"
-            - "users"
-            properties:
-              projectId:
-                type: "string"
-              taskId:
-                type: "string"
-              users:
-                $ref: "#/definitions/users"
-        '404':
-          description: "Task or project not found"
+          #  required:
+          #  - "projectId"
+          #  - "taskId"
+          #  - "users"
+          #  properties:
+          #    projectId:
+          #      type: "string"
+          #    taskId:
+          #      type: "string"
+          #    users:
+          #      $ref: "#/definitions/users"
+        '403':
+          description: "Insufficient permissions"
           schema:
             $ref: "#/definitions/error"
+      #  '404':
+      #    description: "Task or project not found"
+      #    schema:
+      #      $ref: "#/definitions/error"
         '422':
           description: "Malformed input"
           schema:

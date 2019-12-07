@@ -66,7 +66,9 @@ const TaskController = {
         }
 
         const taskRef = `${PROJECT_ROOT}/${req.params.project_id}/tasks/${req.params.task_id}`
-        const data = await database.ref(`${taskRef}/assignments`).set(value.assignments)
+        const data = await database.ref(`${taskRef}/assignments`).set(
+          value.assignments.map(assignment => assignment.id)
+        )
         log.debug(`TaskController.assignTask: updated ${req.params.task_id} with: ${JSON.stringify(data)}`)
         res.status(200).json({ taskId: req.params.task_id, assignments: value.assignments })
     },
