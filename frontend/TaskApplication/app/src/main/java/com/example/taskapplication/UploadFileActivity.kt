@@ -1,8 +1,6 @@
 package com.example.taskapplication
 
-import android.content.ContentResolver
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -14,10 +12,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import java.io.IOException
-import android.provider.OpenableColumns
 import androidx.core.net.toUri
 import java.io.File
-import java.util.*
+import com.google.firebase.storage.FirebaseStorage
+import java.util.Date
 
 
 class UploadFileActivity : BaseActivity(), View.OnClickListener{
@@ -27,6 +25,7 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
 
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
+    private lateinit var storage: FirebaseStorage
 
     private lateinit var selectedFile: File // File that will be selected during this activity
 
@@ -48,6 +47,7 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
+        storage = FirebaseStorage.getInstance()
     }
 
     // actions on click menu items
@@ -93,6 +93,39 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
             }
             R.id.button_upload_file -> {
                 // TODO: upload to firebase cloud and link to project
+
+                val pid = intent.getStringExtra("pid")
+                if (pid != null)
+                {
+                    val storage_ref = storage.reference.child("project_files/$pid/${selectedFile.name}")
+
+                    Log.d(TAG, "storage ref: ${selectedFile.name}")
+                    Log.d(TAG, "storage ref: $storage_ref")
+
+                    var uploadSection = findViewById<LinearLayout>(R.id.upload_progress)
+                    var progressStatus = findViewById<TextView>(R.id.tv_upload_progress_status)
+                    var progress = findViewById<ProgressBar>(R.id.upload_progress_bar)
+
+                    uploadSection.visibility = View.VISIBLE // mark whole section as visible
+                    progress.setProgress(0, false)
+
+                    storage_ref.putFile(selectedFile.toUri())
+                        .addOnSuccessListener { taskSnapshot ->
+                            // Uri: taskSnapshot.downloadUrl
+                            // Name: taskSnapshot.metadata!!.name
+                            // Path: taskSnapshot.metadata!!.path
+                            // Size: taskSnapshot.metadata!!.sizeBytes
+                            progressStatus.text = "Upload successful!\nPath: ${taskSnapshot.metadata!!.path}\nUploaded size: ${taskSnapshot.metadata!!.sizeBytes}"
+                        }
+                        .addOnFailureListener { exception ->
+                            progressStatus.text = "Upload failed: $exception"
+                        }
+                        .addOnProgressListener { taskSnapshot ->
+                            val percentage = taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
+                            progress.setProgress(percentage.toInt(), true)
+                        }
+
+                }
             }
         }
     }

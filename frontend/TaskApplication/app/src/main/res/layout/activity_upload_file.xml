@@ -66,4 +66,44 @@
         android:visibility="invisible"
         android:text="@string/tv_file_information_placeholder" />
 
+    <LinearLayout
+        android:id="@+id/upload_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <TextView
+            android:id="@+id/tv_upload_progress_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_marginTop="20dp"
+            android:textSize="18sp"
+            android:text="@string/tv_upload_progress" />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:id="@+id/upload_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="false"
+            android:max="100"
+            android:minHeight="50dp"
+            android:minWidth="300dp"
+            android:progress="1"
+            android:progressBackgroundTint="@android:color/darker_gray"
+            android:progressTint="@color/colorPrimary" />
+
+        <TextView
+            android:id="@+id/tv_upload_progress_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_marginTop="20dp"
+            android:textSize="18sp"/>
+
+    </LinearLayout>
+
 </LinearLayout>
