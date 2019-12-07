@@ -1,6 +1,8 @@
 package com.example.taskapplication
 
+import android.content.ContentResolver
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,16 +15,20 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import java.io.IOException
 import android.provider.OpenableColumns
+import androidx.core.net.toUri
 import java.io.File
+import java.util.*
 
 
 class UploadFileActivity : BaseActivity(), View.OnClickListener{
 
-    private lateinit var textViewFileInfo: TextView
-    private lateinit var imageViewPreview: ImageView
+    private lateinit var textViewFileInfo: TextView // for displaying data about file
+    private lateinit var imageViewPreview: ImageView // for displaying preview of images
 
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
+
+    private lateinit var selectedFile: File // File that will be selected during this activity
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +75,7 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                         "image/jpeg",       // .jpg (https://stackoverflow.com/a/37266399)
                         "audio/mpeg"        // .mp3 (https://stackoverflow.com/a/10688641)
                     ))
-                    intent.putExtra("return-data", true)
+                    //intent.putExtra("return-data", true)
                     startActivityForResult(intent, FILE_PICK_REQUEST)
                 }
                 "image" -> {
@@ -85,7 +91,9 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                     throw Exception("wrong intent type")
                 }
             }
-            R.id.button_upload_file -> true
+            R.id.button_upload_file -> {
+                // TODO: upload to firebase cloud and link to project
+            }
         }
     }
 
@@ -99,51 +107,41 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
             if (data != null) {
                 try
                 {
-                    val selectedUri = data.data
+                    var selectedUri: String? = null
+                    val cursor = applicationContext.contentResolver.query(data.data as Uri, null, null, null, null)
+                    if(cursor!!.moveToFirst())
+                    {
+                        selectedUri = Uri.parse(cursor.getString(0)).path
+                    }
+                    cursor.close()
 
-                    textViewFileInfo.text = "Selected file: ${getFileName(selectedUri as Uri)}"
+                    if (selectedUri != null) {
+                        selectedFile = File(selectedUri)
+                    }
+
+                    if (!selectedFile.exists()) {
+                        Log.w(TAG, "file doesn't exist? $selectedFile")
+                    }
+
                     textViewFileInfo.visibility = View.VISIBLE
+                    textViewFileInfo.text =
+                        "Selected file: ${selectedFile.name}\n" +
+                        "File size: ${selectedFile.length() / 1000} bytes\n" +
+                        "Last modified: ${Date(selectedFile.lastModified())}"
 
                     if (requestCode == IMAGE_PICK_REQUEST)
                     {
-                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedUri)
+                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedFile.toUri())
                         imageViewPreview.setImageBitmap(bitmap)
                         imageViewPreview.setBackgroundResource(android.R.color.transparent)
                         imageViewPreview.visibility = View.VISIBLE
-
-                        textViewFileInfo.text = textViewFileInfo.text.toString() + "\nSize: ${bitmap.byteCount / 1000} KB"
                     }
-
-                    // TODO: upload to firebase cloud and link to project
                 }
                 catch (e: IOException) {
                     e.printStackTrace()
                 }
             }
         }
-    }
-
-    // From https://stackoverflow.com/a/5569478
-    private fun getFileName(uri: Uri): String {
-        var result: String? = null
-        if (uri.scheme == "content") {
-            val cursor = contentResolver.query(uri, null, null, null, null)
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                }
-            } finally {
-                cursor!!.close()
-            }
-        }
-        if (result == null) {
-            result = uri.path
-            val cut = result!!.lastIndexOf('/')
-            if (cut != -1) {
-                result = result.substring(cut + 1)
-            }
-        }
-        return result
     }
 
     companion object {
