@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
-import android.widget.CheckBox
 import android.widget.ListView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -25,6 +24,8 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
     private lateinit var auth: FirebaseAuth
     // Declare an instance of Firebase Realtime Database.
     private lateinit var database: DatabaseReference
+    // Keep track of the project ID for this task.
+    private lateinit var projectId: String
     // Declare an instance of ListView to display the list of tasks.
     private lateinit var listView: ListView
     private lateinit var taskAdapter: TasksCustomAdapter
@@ -117,6 +118,7 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
 
     private fun createTask() {
         val intent = Intent(this, CreateTaskActivity::class.java)
+        intent.putExtra("pid", projectId)
         startActivity(intent)
     }
 
@@ -230,8 +232,8 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
         if (user != null) {
             // The projectId of this project must be passed as
             // an extra from an Activity calling this activity.
-            val pid = intent.extras?.getString("pid")
-            val projectPath = database.child("projects").child(pid!!)
+            projectId = intent.extras?.getString("pid")!!
+            val projectPath = database.child("projects").child(projectId)
             val tasksPath = projectPath.child("tasks")
             // The user is signed in, so fetch all tasks here, sorted by creation date.
             // For each, display a checkbox next to it.

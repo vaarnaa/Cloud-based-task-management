@@ -18,7 +18,6 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.loopj.android.http.AsyncHttpResponseHandler
 import com.loopj.android.http.JsonHttpResponseHandler
 import com.loopj.android.http.RequestParams
 import cz.msebera.android.httpclient.Header
@@ -179,7 +178,7 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                         response: JSONObject
                     ) {
                         // Called when response HTTP status is "200 OK".
-                        Log.d(TAG, "createProject:APIClient:Post:onSuccess")
+                        Log.d(TAG, "createProject:APIClient:onSuccess")
                         // Add the received project ID to this user's projects.
                         val pid = response.getString("id")
                         database.child("users")
@@ -187,10 +186,7 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                             .child("projects")
                             .child(pid)
                             .setValue("")
-                            .addOnSuccessListener {
-                                Log.d(TAG, "POST SUCCEEDED, REDIRECTING")
-                                successRedirect()
-                            }
+                            .addOnSuccessListener { successRedirect() }
                     }
                     override fun onFailure(
                         statusCode: Int,
@@ -199,7 +195,7 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                         error: Throwable?
                     ) {
                         // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
-                        Log.d(TAG, "createProject:APIClient:Post:onFailure")
+                        Log.d(TAG, "createProject:APIClient:onFailure")
                         Log.d(TAG, "statusCode $statusCode")
                         Log.d(TAG, "headers ${headers?.forEach(::println)}")
                         Log.d(TAG, "responseString $responseString")
