@@ -66,11 +66,11 @@ const ProjectController = {
             admin: req.auth_user.id,
             type: value.type,
             created: new Date(),
-            deadline: value.deadline && new Date(value.deadline),
-            badge: value.badge, // url to image
+            deadline: value.deadline && new Date(value.deadline) || null,
+            badge: value.badge || null, // url to image
             tasks: { },
             members: [],
-            keywords: value.keywords,
+            keywords: value.keywords || [],
             attachments: { },
         }
         updates[`${ref_root}/${newId}`] = newProject

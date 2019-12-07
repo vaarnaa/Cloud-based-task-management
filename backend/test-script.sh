@@ -74,7 +74,7 @@ post() {
 
 ## ACTUAL TESTING
 
-post "/project" '{"name":"project_name1","description":"desc","deadline":"Wed, 14 Jun 2020 07:00:00 GMT"}'
+post "/project" '{"name":"project_name1","type":"group", "description":"desc","deadline":"Wed, 14 Jun 2020 07:00:00 GMT"}'
 PROJECT_ID=$(echo "${ret_val}" | ${JQ} '.project_id')
 
 get "/project/${PROJECT_ID}"
