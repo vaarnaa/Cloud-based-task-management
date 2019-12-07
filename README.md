@@ -6,7 +6,7 @@ Backend (located under `./backend`) contains the app engine and endpoints config
 Testing and linting don't require a server running:
 ```
 npm test
-npm run lint -- --fix --coverage
+npm run lint -- --fix
 ```
 
 VSCode will automatically use its integrated eslint plugin. Be sure to fix

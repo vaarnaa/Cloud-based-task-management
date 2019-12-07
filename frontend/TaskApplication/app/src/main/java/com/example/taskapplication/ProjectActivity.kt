@@ -38,6 +38,15 @@ class ProjectActivity : BaseActivity(),
     private val taskEntries = arrayListOf<Map<String, String>>()
     private var updatingTaskList = false
 
+
+    enum class PageType {
+        TASKS,
+        IMAGES,
+        FILES
+    }
+
+    private var currentPage = PageType.TASKS
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_project)
@@ -108,31 +117,28 @@ class ProjectActivity : BaseActivity(),
         // Open fragment for the specific menu item
         when (item.itemId) {
             R.id.navigation_tasks -> {
-                Toast.makeText(this,
-                    "Tasks clicked",
-                    Toast.LENGTH_SHORT).show()
+                currentPage = PageType.TASKS
+                Toast.makeText(this, "Tasks clicked", Toast.LENGTH_SHORT).show()
                 val tasksFragment = TasksFragment.newInstance()
                 openFragment(tasksFragment)
-                return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_pictures -> {
-                Toast.makeText(this,
-                    "Pictures clicked",
-                    Toast.LENGTH_SHORT).show()
+                currentPage = PageType.IMAGES
+                Toast.makeText(this, "Pictures clicked", Toast.LENGTH_SHORT).show()
                 val picturesFragment = PicturesFragment.newInstance()
                 openFragment(picturesFragment)
-                return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_files -> {
-                Toast.makeText(this,
-                    "Files clicked",
-                    Toast.LENGTH_SHORT).show()
+                currentPage = PageType.FILES
+                Toast.makeText(this,"Files clicked", Toast.LENGTH_SHORT).show()
                 val filesFragment = FilesFragment.newInstance()
                 openFragment(filesFragment)
-                return@OnNavigationItemSelectedListener true
+            }
+            else -> {
+                return@OnNavigationItemSelectedListener false
             }
         }
-        false
+        return@OnNavigationItemSelectedListener true
     }
 
     private fun openFragment(fragment: Fragment) {
@@ -140,12 +146,6 @@ class ProjectActivity : BaseActivity(),
         transaction.replace(R.id.fragment_place_holder, fragment)
         transaction.addToBackStack(null)
         transaction.commit()
-    }
-
-    private fun createTask() {
-        val intent = Intent(this, CreateTaskActivity::class.java)
-        intent.putExtra("pid", projectId)
-        startActivity(intent)
     }
 
     fun updateTask(tid: String, status: String) {
@@ -284,7 +284,25 @@ class ProjectActivity : BaseActivity(),
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.fab_project -> createTask()
+            R.id.fab_project -> {
+                when (currentPage) {
+                    PageType.TASKS -> {
+                        val intent = Intent(this, CreateTaskActivity::class.java)
+                        intent.putExtra("pid", projectId)
+                        startActivity(intent)
+                    }
+                    PageType.FILES -> {
+                        val intent = Intent(this, UploadFileActivity::class.java)
+                        intent.putExtra("type", "file")
+                        startActivity(intent)
+                    }
+                    PageType.IMAGES -> {
+                        val intent = Intent(this, UploadFileActivity::class.java)
+                        intent.putExtra("type", "image")
+                        startActivity(intent)
+                    }
+                }
+            }
         }
     }
 
