@@ -15,7 +15,6 @@ import java.io.IOException
 import android.provider.OpenableColumns
 import java.io.File
 
-
 class UploadFileActivity : BaseActivity(), View.OnClickListener{
 
     private lateinit var textViewFileInfo: TextView
@@ -23,6 +22,10 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
 
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
+
+    // Keep track of the project ID and name for this task.
+    private lateinit var projectId: String
+    private lateinit var projectName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +45,11 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
+
+        // The projectId of this project must be passed as
+        // an extra from an Activity calling this activity.
+        projectId = intent.extras?.getString("pid")!!
+        projectName = intent.extras?.getString("name")!!
     }
 
     // actions on click menu items
@@ -115,6 +123,8 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                     }
 
                     // TODO: upload to firebase cloud and link to project
+
+                    // successRedirect()
                 }
                 catch (e: IOException) {
                     e.printStackTrace()
@@ -144,6 +154,14 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
             }
         }
         return result
+    }
+
+    private fun successRedirect() {
+        // Redirect to ProjectActivity upon success.
+        val intent = Intent(this, ProjectActivity::class.java)
+        intent.putExtra("pid", projectId)
+        intent.putExtra("name", projectName)
+        startActivity(intent)
     }
 
     companion object {
