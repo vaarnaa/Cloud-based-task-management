@@ -81,11 +81,12 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         projectIds.children.forEach { l.add(it.key.toString()) }
         val p = l.toTypedArray()
         Log.d(TAG, "fetchProjects:p: ${p.contentToString()}")
+
         // Fetch the project contents for each project ID.
         projectEntries.clear()
         for (id in p) {
-            readFromDatabase(database.child("projects").child(id),
-                "populateProjectList")
+            val ref = database.child("projects").child(id)
+            readFromDatabase(ref,"populateProjectList")
         }
     }
 
@@ -99,11 +100,14 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
             "pid" to pid,
             "name" to name,
             "modified" to modified)
+
         Log.d(TAG, "pid: $pid name: $name modified: $modified")
+
         // Ensure mutual exclusion while updating the critical section.
         while (updatingProjectList) { }
         updatingProjectList = true
         projectEntries.add(projectMap)
+
         // Sort the list by modification date, recent ones first.
         projectEntries.sortWith(compareBy {
             Log.d(TAG, "it: $it")
@@ -112,6 +116,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         projectEntries.reverse()
         Log.d(TAG,"sorted projectEntries: ${projectEntries.toTypedArray().contentToString()}")
         updatingProjectList = false
+
         // Refresh the project list view.
         customAdapter.notifyDataSetChanged()
         Log.d(TAG, "projectEntries:${projectEntries.toTypedArray().contentToString()}")
@@ -155,6 +160,7 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
             // The user is signed in, so fetch all projects here, sorted by modification date.
             // For each, show modification date, media icon, and up to 3 profile images.
             readFromDatabase(userProjectsPath, "fetchProjects")
+
         } else {
             // The user is signed out, so redirect to the login page.
             val intent = Intent(this, MainActivity::class.java)
