@@ -121,9 +121,9 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                             // Name: taskSnapshot.metadata!!.name
                             // Path: taskSnapshot.metadata!!.path
                             // Size: taskSnapshot.metadata!!.sizeBytes
-                            progressStatus.text = "Upload successful!\nPath: ${taskSnapshot.metadata!!.path}\nUploaded size: ${taskSnapshot.metadata!!.sizeBytes}"
+                            progress.setProgress(100, true)
+                            progressStatus.text = "Upload successful!\nPath: ${taskSnapshot.metadata!!.path}\nUploaded size: ${taskSnapshot.metadata!!.sizeBytes / 1000} KB"
 
-                            // TODO: link file to project in database
                             successRedirect()
                         }
                         .addOnFailureListener { exception ->
@@ -168,7 +168,7 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                     textViewFileInfo.visibility = View.VISIBLE
                     textViewFileInfo.text =
                         "Selected file: ${selectedFile.name}\n" +
-                        "File size: ${selectedFile.length() / 1000} bytes\n" +
+                        "File size: ${selectedFile.length() / 1000} KB\n" +
                         "Last modified: ${Date(selectedFile.lastModified())}"
 
                     if (requestCode == IMAGE_PICK_REQUEST)
