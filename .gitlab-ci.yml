@@ -1,14 +1,18 @@
 image: node:latest
 
+stages:
+  - first
+  - second
+
 eslint:
-  stage: test
+  stage: first
   script:
     - cd backend
     - npm install
     - npm run lint
 
 jest:
-  stage: test
+  stage: first
   script:
     - cd backend
     - npm install
@@ -21,7 +25,7 @@ jest:
 
 pages:
   image: alpine
-  stage: deploy
+  stage: second
   script:
     - apk add curl
     - cd backend/coverage
@@ -29,3 +33,14 @@ pages:
     - curl https://mcc.zi.fi/mccproject -X POST -T lcov-report.tar
   only:
     - master
+
+frontend:
+  image: mreichelt/android:29
+  stage: second
+  script:
+    - cd frontend/TaskApplication/
+    - ./gradlew check assemble
+    - mv app/build/outputs/apk/*/*.apk ../../
+  artifacts:
+    paths:
+      - "*.apk"

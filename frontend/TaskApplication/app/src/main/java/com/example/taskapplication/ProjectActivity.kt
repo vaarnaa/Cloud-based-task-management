@@ -1,6 +1,7 @@
 package com.example.taskapplication
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -19,13 +20,17 @@ import cz.msebera.android.httpclient.Header
 import kotlinx.android.synthetic.main.activity_project.*
 import org.json.JSONObject
 
-class ProjectActivity : BaseActivity(), View.OnClickListener {
+class ProjectActivity : BaseActivity(),
+    View.OnClickListener,
+    TasksFragment.OnFragmentInteractionListener,
+    PicturesFragment.OnFragmentInteractionListener,
+    FilesFragment.OnFragmentInteractionListener{
     // Declare an instance of Firebase Auth.
     private lateinit var auth: FirebaseAuth
     // Declare an instance of Firebase Realtime Database.
     private lateinit var database: DatabaseReference
     // Keep track of the project ID for this task.
-    private lateinit var projectId: String
+    lateinit var projectId: String
     // Declare an instance of ListView to display the list of tasks.
     private lateinit var listView: ListView
     private lateinit var taskAdapter: TasksCustomAdapter
@@ -35,9 +40,9 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_project)
+        setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        setSupportActionBar(findViewById(R.id.toolbar))
         // Handle clicks in `onClick`.
         fab_project.setOnClickListener(this)
         // Initialize the task list and the adapter used to populate it.
@@ -53,11 +58,19 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
                 val st = taskAdapter.getItem(position)!!.getValue("status")
                 updateTask(id, st)
             }
+
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+
+        // Set default fragment and place in layout
+        if (savedInstanceState == null) {
+            val firstFragment = TasksFragment()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_place_holder, firstFragment).commit()
+        }
     }
 
     public override fun onStart() {
@@ -65,6 +78,10 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
         updateUI(currentUser)
+    }
+
+    override fun onFragmentInteraction(uri: Uri) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     // actions on click menu items
@@ -85,24 +102,24 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
                 Toast.makeText(this,
                     "Tasks clicked",
                     Toast.LENGTH_SHORT).show()
-                //val tasksFragment = TasksFragment.newInstance()
-                //openFragment(songsFragment)
+                val tasksFragment = TasksFragment.newInstance()
+                openFragment(tasksFragment)
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_pictures -> {
                 Toast.makeText(this,
                     "Pictures clicked",
                     Toast.LENGTH_SHORT).show()
-                //val picturesFragment = PicturesFragment.newInstance()
-                //openFragment(albumsFragment)
+                val picturesFragment = PicturesFragment.newInstance()
+                openFragment(picturesFragment)
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_files -> {
                 Toast.makeText(this,
                     "Files clicked",
                     Toast.LENGTH_SHORT).show()
-                //val filesFragment = FilesFragment.newInstance()
-                //openFragment(artistsFragment)
+                val filesFragment = FilesFragment.newInstance()
+                openFragment(filesFragment)
                 return@OnNavigationItemSelectedListener true
             }
         }
@@ -111,7 +128,7 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
 
     private fun openFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.container, fragment)
+        transaction.replace(R.id.fragment_place_holder, fragment)
         transaction.addToBackStack(null)
         transaction.commit()
     }
@@ -122,7 +139,7 @@ class ProjectActivity : BaseActivity(), View.OnClickListener {
         startActivity(intent)
     }
 
-    private fun updateTask(tid: String, status: String) {
+    fun updateTask(tid: String, status: String) {
         showProgressDialog()
         // Update the status of the given task with our API.
         val user = auth.currentUser
