@@ -35,7 +35,7 @@ const notBelongsToProject = async (userId, projectId) => !(await belongsToProjec
 // TODO: move to different place
 const setModifiedToNow = async (projectId) => {
     const ref = `${PROJECT_ROOT}/${projectId}/modified`
-    await database.ref(ref).set(new Date())
+    await database.ref().update({ [ref]: new Date() })
 }
 
 module.exports = {
