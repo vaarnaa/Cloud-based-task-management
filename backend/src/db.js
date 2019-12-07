@@ -1,5 +1,5 @@
 'use strict'
-const admin = require('firebase-admin');
+const admin = require('firebase-admin')
 const env = require('./env')
 const log = require('./log')
 
