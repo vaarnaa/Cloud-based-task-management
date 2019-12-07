@@ -25,8 +25,9 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
     private lateinit var auth: FirebaseAuth
     // Declare an instance of Firebase Realtime Database.
     private lateinit var database: DatabaseReference
-    // Keep track of the project ID for this task.
+    // Keep track of the project ID and name for this task.
     private lateinit var projectId: String
+    private lateinit var projectName: String
     // Keep track of the user-set deadline for the task.
     private lateinit var deadline: LocalDateTime
 
@@ -114,6 +115,7 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
         // Redirect to ProjectActivity upon success.
         val intent = Intent(this, ProjectActivity::class.java)
         intent.putExtra("pid", projectId)
+        intent.putExtra("name", projectName)
         startActivity(intent)
     }
 
@@ -152,6 +154,7 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
             // The projectId of this project must be passed as
             // an extra from an Activity calling this activity.
             projectId = intent.extras?.getString("pid")!!
+            projectName = intent.extras?.getString("name")!!
             val cal = Calendar.getInstance()
             val myFormat = "dd-MM-yyyy HH:mm:ss"
             val sdf = SimpleDateFormat(myFormat, Locale.US)

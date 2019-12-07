@@ -27,10 +27,16 @@ const getProject = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}`)
 
 const belongsToProject = async (userId, projectId) => {
     const { admin, members } = await getProject(projectId)
-    return admin === userId || members.find(member => member === userId)
+    return admin === userId || (members || []).find(member => member === userId)
 }
 
 const notBelongsToProject = async (userId, projectId) => !(await belongsToProject(userId, projectId))
+
+// TODO: move to different place
+const setModifiedToNow = async (projectId) => {
+    const ref = `${PROJECT_ROOT}/${projectId}/modified`
+    await database.ref().update({ [ref]: new Date() })
+}
 
 module.exports = {
     resolveRef,
@@ -40,5 +46,6 @@ module.exports = {
     belongsToProject,
     notBelongsToProject,
     getProject,
+    setModifiedToNow,
     PROJECT_ROOT,
 }

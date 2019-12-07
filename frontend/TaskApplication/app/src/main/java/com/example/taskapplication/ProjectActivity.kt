@@ -30,8 +30,9 @@ class ProjectActivity : BaseActivity(),
     private lateinit var auth: FirebaseAuth
     // Declare an instance of Firebase Realtime Database.
     private lateinit var database: DatabaseReference
-    // Keep track of the project ID for this task.
+    // Keep track of the project ID and name for this task.
     lateinit var projectId: String
+    lateinit var projectName: String
     // Declare an instance of ListView to display the list of tasks.
     private lateinit var listView: ListView
     private lateinit var taskAdapter: TasksCustomAdapter
@@ -268,7 +269,7 @@ class ProjectActivity : BaseActivity(),
             // The projectId of this project must be passed as
             // an extra from an Activity calling this activity.
             projectId = intent.extras?.getString("pid")!!
-            val projectName = intent.extras?.getString("name")!!
+            projectName = intent.extras?.getString("name")!!
             supportActionBar?.setTitle(projectName)
             val projectPath = database.child("projects").child(projectId)
             val tasksPath = projectPath.child("tasks")
@@ -289,18 +290,23 @@ class ProjectActivity : BaseActivity(),
                     PageType.TASKS -> {
                         val intent = Intent(this, CreateTaskActivity::class.java)
                         intent.putExtra("pid", projectId)
+                        intent.putExtra("name", projectName)
                         startActivity(intent)
                     }
                     PageType.FILES -> {
                         val intent = Intent(this, UploadFileActivity::class.java)
                         intent.putExtra("pid", projectId)
                         intent.putExtra("type", "file")
+                        intent.putExtra("pid", projectId)
+                        intent.putExtra("name", projectName)
                         startActivity(intent)
                     }
                     PageType.IMAGES -> {
                         val intent = Intent(this, UploadFileActivity::class.java)
                         intent.putExtra("pid", projectId)
                         intent.putExtra("type", "image")
+                        intent.putExtra("pid", projectId)
+                        intent.putExtra("name", projectName)
                         startActivity(intent)
                     }
                 }
