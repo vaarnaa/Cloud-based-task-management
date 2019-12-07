@@ -54,6 +54,8 @@
     <string name="pick_file">Select File</string>
     <string name="tv_upload_file_heading_text_placeholder">[File placeholder]</string>
     <string name="tv_file_information_placeholder">[Information placeholder]</string>
+    <string name="tv_upload_progress">Upload progress</string>
+
     <string-array name="image_quality_array">
         <item>Full (original size)</item>
         <item>High (1280x960 px)</item>

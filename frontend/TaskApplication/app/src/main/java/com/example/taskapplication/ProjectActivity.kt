@@ -295,6 +295,7 @@ class ProjectActivity : BaseActivity(),
                     }
                     PageType.FILES -> {
                         val intent = Intent(this, UploadFileActivity::class.java)
+                        intent.putExtra("pid", projectId)
                         intent.putExtra("type", "file")
                         intent.putExtra("pid", projectId)
                         intent.putExtra("name", projectName)
@@ -302,6 +303,7 @@ class ProjectActivity : BaseActivity(),
                     }
                     PageType.IMAGES -> {
                         val intent = Intent(this, UploadFileActivity::class.java)
+                        intent.putExtra("pid", projectId)
                         intent.putExtra("type", "image")
                         intent.putExtra("pid", projectId)
                         intent.putExtra("name", projectName)
