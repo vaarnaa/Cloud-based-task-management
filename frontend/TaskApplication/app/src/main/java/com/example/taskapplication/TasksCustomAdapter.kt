@@ -1,6 +1,8 @@
 package com.example.taskapplication
 
 import android.content.Context
+import android.graphics.Paint
+import android.graphics.Typeface
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +36,15 @@ class TasksCustomAdapter(applicationContext: Context,
         val checkBoxView = returnedView!!.projectTaskCheckBox
         val task = ts[position]
         checkBoxView.text = task.getValue("description")
+        // Mark the checkbox with a tick mark only if it is marked complete.
+        // Otherwise, remove the tick mark. Also make the text strike through.
+        if (task.getValue("status") == "completed") {
+            checkBoxView.isChecked = true
+            checkBoxView.paintFlags = checkBoxView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+        } else {
+            checkBoxView.isChecked = false
+            checkBoxView.paintFlags = checkBoxView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+        }
         return returnedView
     }
 
