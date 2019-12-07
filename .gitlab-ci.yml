@@ -1,14 +1,18 @@
 image: node:latest
 
+stages:
+  - first
+  - second
+
 eslint:
-  stage: test
+  stage: first
   script:
     - cd backend
     - npm install
     - npm run lint
 
 jest:
-  stage: test
+  stage: first
   script:
     - cd backend
     - npm install
@@ -21,7 +25,7 @@ jest:
 
 pages:
   image: alpine
-  stage: build   # not "deploy" to allow running concurrently with Android build
+  stage: second
   script:
     - apk add curl
     - cd backend/coverage
@@ -32,7 +36,7 @@ pages:
 
 frontend:
   image: mreichelt/android:29
-  stage: build
+  stage: second
   script:
     - cd frontend/TaskApplication/
     - ./gradlew check assemble
