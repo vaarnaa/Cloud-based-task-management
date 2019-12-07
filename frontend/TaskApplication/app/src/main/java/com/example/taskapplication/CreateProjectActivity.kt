@@ -184,11 +184,11 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                                 .addOnSuccessListener { successRedirect() }
                             // TODO: (TEMPORARY) This should be done in the backend.
                             // Add the `modified` key to the project in the database.
-                            val modified = LocalDateTime.now().toString()
+                            /*val modified = LocalDateTime.now().toString()
                             database.child("projects")
                                 .child(pid)
                                 .child("modified")
-                                .setValue(modified)
+                                .setValue(modified)*/
                         }
                         override fun onFailure(
                             statusCode: Int,

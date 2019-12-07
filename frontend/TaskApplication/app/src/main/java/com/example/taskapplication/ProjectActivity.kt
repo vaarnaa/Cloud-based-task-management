@@ -56,7 +56,15 @@ class ProjectActivity : BaseActivity(),
                 Log.d(TAG, "position $position")
                 Log.d(TAG, "getItemAtPosition ${parent.getItemAtPosition(position)}")
                 val id = taskAdapter.getItem(position)!!.getValue("tid")
-                val st = taskAdapter.getItem(position)!!.getValue("status")
+                var st = taskAdapter.getItem(position)!!.getValue("status")
+                val assigned = false // TODO: Check if database path tasks/<tid>/users has children.
+                // If the checkbox was checked, mark it unchecked.
+                // Change the status depending whether it was assigned to a user or not.
+                if (st == "completed") {
+                    if (assigned) st = "on-going" else st = "pending"
+                } else {
+                    st = "completed"
+                }
                 updateTask(id, st)
             }
 
@@ -148,15 +156,18 @@ class ProjectActivity : BaseActivity(),
             if (task.isSuccessful) {
                 val idToken = task.result!!.token!!
                 Log.d(TAG, "idToken $idToken")
-                val jsonParams = JSONObject()
-                Log.d(TAG, "----- 1 ----- params $jsonParams")
-                jsonParams.put("status", status)
-                Log.d(TAG, "----- 2 ----- params $jsonParams")
+                val requestBody = mapOf(
+                    "status" to status
+                )
+                Log.d(TAG, "---------- requestBody $requestBody")
+                val jsonParams = JSONObject(requestBody)
+                Log.d(TAG, "---------- jsonParams $jsonParams")
                 val entity = StringEntity(jsonParams.toString())
-                // PUT https://mcc-fall-2019-g09.appspot.com/task/<taskId>
+                Log.d(TAG, "---------- entity $entity")
+                // PUT https://mcc-fall-2019-g09.appspot.com/project/{pid}/task/{tid}/status
                 APIClient.put(
                     applicationContext,
-                    "task/$tid",
+                    "project/$projectId/task/$tid/status",
                     idToken,
                     entity,
                     ContentType.APPLICATION_JSON.mimeType,
@@ -173,19 +184,6 @@ class ProjectActivity : BaseActivity(),
                         override fun onFailure(
                             statusCode: Int,
                             headers: Array<out Header>?,
-                            responseString: String,
-                            error: Throwable?
-                        ) {
-                            // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
-                            Log.d(TAG, "createProject:APIClient:onFailure")
-                            Log.d(TAG, "statusCode $statusCode")
-                            Log.d(TAG, "headers ${headers?.forEach(::println)}")
-                            Log.d(TAG, "responseString $responseString")
-                            Log.d(TAG, "error $error")
-                        }
-                        override fun onFailure(
-                            statusCode: Int,
-                            headers: Array<out Header>?,
                             error: Throwable?,
                             data: JSONObject
                         ) {
@@ -193,7 +191,7 @@ class ProjectActivity : BaseActivity(),
                             Log.d(TAG, "createProject:APIClient:onFailure")
                             Log.d(TAG, "statusCode $statusCode")
                             Log.d(TAG, "headers ${headers?.forEach(::println)}")
-                            Log.d(TAG, "data $data")
+                            Log.d(TAG, "data ${data.toString(2)}")
                             Log.d(TAG, "error $error")
                         }
                     })

@@ -77,16 +77,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
-            android:inputType="text"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textColor="?android:textColorHint"
-            android:text="@string/project_deadline" />
+            android:text="@string/deadline" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginLeft="5dp">
+            android:layout_marginStart="5dp">
 
             <TextView
                 android:id="@+id/tv_project_deadline_time"
@@ -100,8 +99,8 @@
                 android:id="@+id/setDeadlineButton"
                 android:layout_width="50dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="2dp"
-                android:text="@string/set_project_deadline"/>
+                android:layout_marginStart="2dp"
+                android:text="@string/set"/>
 
         </LinearLayout>
 
