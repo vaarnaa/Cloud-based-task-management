@@ -32,6 +32,12 @@ const belongsToProject = async (userId, projectId) => {
 
 const notBelongsToProject = async (userId, projectId) => !(await belongsToProject(userId, projectId))
 
+// TODO: move to different place
+const setModifiedToNow = async (projectId) => {
+    const ref = `${PROJECT_ROOT}/${projectId}/modified`
+    await database(ref).set(new Date())
+}
+
 module.exports = {
     resolveRef,
     getProjectMembers,
@@ -40,5 +46,6 @@ module.exports = {
     belongsToProject,
     notBelongsToProject,
     getProject,
+    setModifiedToNow,
     PROJECT_ROOT,
 }

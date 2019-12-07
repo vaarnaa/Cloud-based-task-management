@@ -1,7 +1,10 @@
 'use strict'
 const { database } = require('../db')
 const { projectBody, membersBody } = require('../schemas')
-const { getProjectAdmin, getProjectMembers, PROJECT_ROOT } = require('../refs')
+const {
+    getProjectAdmin, getProjectMembers,
+    PROJECT_ROOT, setModifiedToNow,
+} = require('../refs')
 const log = require('../log')
 
 const ref_root = PROJECT_ROOT
@@ -150,6 +153,7 @@ const ProjectController = {
             `${ref_root}/${req.params.project_id}/members`
         ).set(req.body.members.map(member => member.id))
 
+        await setModifiedToNow(req.params.project_id)
 
         res.status(200).json(data)
     },
