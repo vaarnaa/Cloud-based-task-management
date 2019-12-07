@@ -82,6 +82,19 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
                         Log.d(TAG, "responseString $responseString")
                         Log.d(TAG, "error $error")
                     }
+                    override fun onFailure(
+                        statusCode: Int,
+                        headers: Array<out Header>?,
+                        error: Throwable?,
+                        data: JSONObject
+                    ) {
+                        // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
+                        Log.d(TAG, "createProject:APIClient:onFailure")
+                        Log.d(TAG, "statusCode $statusCode")
+                        Log.d(TAG, "headers ${headers?.forEach(::println)}")
+                        Log.d(TAG, "data $data")
+                        Log.d(TAG, "error $error")
+                    }
                 })
             } else {
                 // Handle error -> task.getException();

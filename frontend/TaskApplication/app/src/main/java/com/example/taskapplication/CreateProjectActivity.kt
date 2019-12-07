@@ -206,9 +206,24 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                         Log.d(TAG, "responseString $responseString")
                         Log.d(TAG, "error $error")
                     }
+                    override fun onFailure(
+                        statusCode: Int,
+                        headers: Array<out Header>?,
+                        error: Throwable?,
+                        data: JSONObject
+                    ) {
+                        // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
+                        Log.d(TAG, "createProject:APIClient:onFailure")
+                        Log.d(TAG, "statusCode $statusCode")
+                        headers?.forEach(::println) // NB, these are printed with `System.out` tag
+                        Log.d(TAG, "response data: ${data.toString()}}")
+                        Log.d(TAG, "error $error")
+                    }
                 })
             } else {
                 // Handle error -> task.getException();
+
+                Log.w(TAG, String.format("user id get was not successful: %s", task.exception.toString()))
             }
             hideProgressDialog()
         }
