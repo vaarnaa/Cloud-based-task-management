@@ -20,10 +20,12 @@ jest:
     expire_in: 30 days
 
 pages:
+  image: alpine
   stage: deploy
   script:
+    - apk add curl
     - cd backend/coverage
-    - zip -r lcov-report.zip lcov-report
-    - curl https://mcc.zi.fi/mccproject -X POST -T lcov-report.zip
+    - tar cf lcov-report.tar lcov-report
+    - curl https://mcc.zi.fi/mccproject -X POST -T lcov-report.tar
   only:
     - master
