@@ -4,6 +4,7 @@ const { projectBody, membersBody } = require('../schemas')
 const {
     getProjectAdmin, getProjectMembers,
     PROJECT_ROOT, setModifiedToNow,
+    USER_ROOT,
 } = require('../refs')
 const log = require('../log')
 
@@ -65,6 +66,8 @@ const ProjectController = {
             events: { },
         }
         updates[`${ref_root}/${newId}`] = newProject
+        // Add project to user's projects
+        updates[`${USER_ROOT}/${req.auth_user.id}/projects/${newId}`] = ''
 
         const values = await database.ref().update(updates)
 
@@ -78,6 +81,7 @@ const ProjectController = {
         log.debug('ProjectController.deleteProject')
 
         const admin = await getProjectAdmin(req.params.project_id)
+        const members = await getProjectMembers(req.params.project_id)
 
         if (!admin) {
             return res.status(404).json(projectNotFoundResponse())
@@ -89,6 +93,9 @@ const ProjectController = {
 
         // TODO: delete also other related data!
         const data = await database.ref(`${ref_root}/${req.params.project_id}`).remove()
+        await Promise.all(members.concat(admin).map(member =>
+            database.ref(`${USER_ROOT}/${member}/projects/${req.params.project_id}`).remove()
+        ))
         res.status(200).json(data)
     },
 
@@ -135,9 +142,28 @@ const ProjectController = {
             return res.status(403).json({ code: 403, message: 'Forbidden operation' })
         }
 
+        const newMembers = req.body.members.map(member => member.id).filter(member => member !== admin)
+
+        const deletedMembers = members.filter(member =>
+            !newMembers.find(newMember => member === newMember)
+        )
+
         const data = await database.ref(
             `${ref_root}/${req.params.project_id}/members`
-        ).set(req.body.members.map(member => member.id))
+        ).set(newMembers)
+
+        await Promise.all([
+            ...deletedMembers.map(member => database.ref(`${USER_ROOT}/${member}/projects/${req.params.project_id}`).remove()),
+            database.ref().update(
+                newMembers.reduce(
+                    (updates, member) => {
+                        updates[`${USER_ROOT}/${member}/projects/${req.params.project_id}`] = ''
+                        return updates
+                    },
+                    {},
+                ),
+            ),
+        ])
 
         await setModifiedToNow(req.params.project_id)
 
