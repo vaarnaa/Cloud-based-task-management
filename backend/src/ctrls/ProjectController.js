@@ -146,16 +146,6 @@ const ProjectController = {
             .filter(member => member !== admin)
             .filter(newMember => !members.find(oldMember => oldMember === newMember))
 
-        // const deletedMembers = members.filter(member =>
-        //    !newMembers.find(newMember => member === newMember)
-        //)
-
-        // const data = await database.ref(
-//            `${ref_root}/${req.params.project_id}/members`
-//        ).set(members.concat(newMembers))
-
-
-
         const data = await database.ref().update({
             ...newMembers.reduce(
                 (updates, member) => {
