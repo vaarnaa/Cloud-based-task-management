@@ -15,6 +15,7 @@ import java.io.IOException
 import androidx.core.net.toUri
 import java.io.File
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageMetadata
 import java.util.Date
 
 class UploadFileActivity : BaseActivity(), View.OnClickListener{
@@ -103,37 +104,45 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                 val pid = intent.getStringExtra("pid")
                 if (pid != null)
                 {
-                    val storage_ref = storage.reference.child("project_files/$pid/${selectedFile.name}")
+                    val storage_ref = storage.reference
+                        .child("project_files/$pid/${selectedFile.name}")
 
                     Log.d(TAG, "storage ref: ${selectedFile.name}")
                     Log.d(TAG, "storage ref: $storage_ref")
 
-                    var uploadSection = findViewById<LinearLayout>(R.id.upload_progress)
-                    var progressStatus = findViewById<TextView>(R.id.tv_upload_progress_status)
-                    var progress = findViewById<ProgressBar>(R.id.upload_progress_bar)
+                    val uploadSection = findViewById<LinearLayout>(R.id.upload_progress)
+                    val progressStatus = findViewById<TextView>(R.id.tv_upload_progress_status)
+                    val progress = findViewById<ProgressBar>(R.id.upload_progress_bar)
 
                     uploadSection.visibility = View.VISIBLE // mark whole section as visible
                     progress.setProgress(0, false)
 
-                    storage_ref.putFile(selectedFile.toUri())
+                    // Add the project ID to the metadata to limit access to project members.
+                    val metadata = StorageMetadata.Builder()
+                        .setCustomMetadata("pid", projectId)
+                        .build()
+
+                    // TODO: Handle activity lifecycle changes!
+                    storage_ref.putFile(selectedFile.toUri(), metadata)
                         .addOnSuccessListener { taskSnapshot ->
                             // Uri: taskSnapshot.downloadUrl
                             // Name: taskSnapshot.metadata!!.name
                             // Path: taskSnapshot.metadata!!.path
                             // Size: taskSnapshot.metadata!!.sizeBytes
                             progress.setProgress(100, true)
-                            progressStatus.text = "Upload successful!\nPath: ${taskSnapshot.metadata!!.path}\nUploaded size: ${taskSnapshot.metadata!!.sizeBytes / 1000} KB"
-
+                            progressStatus.text = "Upload successful!\n" +
+                                    "Path: ${taskSnapshot.metadata!!.path}\n" +
+                                    "Uploaded size: ${taskSnapshot.metadata!!.sizeBytes / 1000} KB"
                             successRedirect()
                         }
                         .addOnFailureListener { exception ->
                             progressStatus.text = "Upload failed: $exception"
                         }
                         .addOnProgressListener { taskSnapshot ->
-                            val percentage = taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
+                            val percentage =
+                                taskSnapshot.bytesTransferred / taskSnapshot.totalByteCount
                             progress.setProgress(percentage.toInt(), true)
                         }
-
                 }
             }
         }
@@ -143,15 +152,22 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK)
         {
-            Log.d(TAG, "Activity Result: $requestCode, $data")
-
-            // NB: Data should have an URI independent of the activity
+            Log.d(TAG, "requestCode $requestCode resultCode $resultCode data $data")
+            // NB: Data should have a URI independent of the activity.
             if (data != null) {
                 try
                 {
+                    Log.d(TAG, "data.data ${data.data}")
+                    Log.d(TAG, "Uri file data.data ${Uri.fromFile(File(data.data.toString()))}")
                     var selectedUri: String? = null
-                    val cursor = applicationContext.contentResolver.query(data.data as Uri, null, null, null, null)
-                    if(cursor!!.moveToFirst())
+                    val cursor = applicationContext.contentResolver.query(
+                        data.data as Uri,
+                        null,
+                        null,
+                        null,
+                        null)
+                    Log.d(TAG, "cursor $cursor")
+                    if (cursor!!.moveToFirst())
                     {
                         selectedUri = Uri.parse(cursor.getString(0)).path
                     }
@@ -159,6 +175,8 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
 
                     if (selectedUri != null) {
                         selectedFile = File(selectedUri)
+                    } else {
+                        Log.d(TAG, "--------------------------- selectedFile not set!")
                     }
 
                     if (!selectedFile.exists()) {
@@ -173,7 +191,14 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
 
                     if (requestCode == IMAGE_PICK_REQUEST)
                     {
-                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedFile.toUri())
+                        /*
+                        // Load thumbnail of a specific media item.
+                        val thumbnail: Bitmap =
+                        applicationContext.contentResolver.loadThumbnail(
+                        content-uri, Size(640, 480), null)
+                         */
+                        val bitmap = MediaStore.Images.Media.getBitmap(
+                            contentResolver, selectedFile.toUri())
                         imageViewPreview.setImageBitmap(bitmap)
                         imageViewPreview.setBackgroundResource(android.R.color.transparent)
                         imageViewPreview.visibility = View.VISIBLE
