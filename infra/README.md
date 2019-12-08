@@ -5,7 +5,7 @@
 3. `docker run -it mcc:infra firebase login:ci --no-localhost`
 4. Follow the wizard and log in.
 5. Save the output token in ./firebase/token.txt
-6. `docker run --rm -it --volumes-from gcloud-config -v ${PWD}/..:/mcc mcc:infra bash` starts an interactive shell inside an mcc:infra container with the repository and gcloud config mounted. Deployments can thereafter be done, e.g. `cd /mcc/backend/ && gcloud endpoints services deploy api.yaml`
+6. `docker run --rm -it --volumes-from gcloud-config -v ${PWD}/..:/mcc mcc:infra bash` starts an interactive shell inside an mcc:infra container with the repository and gcloud config mounted. Deployments can thereafter be done, e.g. `cd /mcc && ./deploy.sh`
 
 
 ## Firebase deployment

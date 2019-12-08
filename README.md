@@ -14,6 +14,9 @@ issues manually or run with `--fix` before commit.
 
 * [Coverage report](https://mcc.zi.fi/lcov-report/)
 
+### Deployment
+Set up docker as described in infra/README.md and run ./deploy.sh.
+
 ## Frontend
 
 Automatically built app APKs are available from
