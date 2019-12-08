@@ -8,7 +8,7 @@ const USER_ROOT    = '/users'
 const resolveRef = async (ref) => {
     const snapshot = await database.ref(ref).once('value')
     const val = snapshot.val()
-    log.debug(`Resolved value for ref ${ref}: ${val}`)
+    log.debug(`Resolved value for ref ${ref}: ${JSON.stringify(val)}`)
     return val
 }
 
@@ -20,7 +20,7 @@ const getProjectAdmin = async (projectId) => {
 
 const getProjectMembers = async (projectId) => {
     const res = await resolveRef(`${PROJECT_ROOT}/${projectId}/members`)
-    return res || []
+    return (res && Object.keys(res)) || []
 }
 const isGroupProject = async (projectId) => {
     const val = await resolveRef(`${PROJECT_ROOT}/${projectId}/type`)
@@ -30,8 +30,8 @@ const isGroupProject = async (projectId) => {
 const getProject = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}`)
 
 const belongsToProject = async (userId, projectId) => {
-    const { admin, members } = await getProject(projectId)
-    return admin === userId || (members || []).find(member => member === userId)
+    const { admin, members } = await getProject(projectId) || { }
+    return admin === userId || ((members && Object.keys(members)) || []).find(member => member === userId)
 }
 
 const notBelongsToProject = async (userId, projectId) => !(await belongsToProject(userId, projectId))

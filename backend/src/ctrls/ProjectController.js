@@ -150,19 +150,28 @@ const ProjectController = {
         //    !newMembers.find(newMember => member === newMember)
         //)
 
-        const data = await database.ref(
-            `${ref_root}/${req.params.project_id}/members`
-        ).set(members.concat(newMembers))
+        // const data = await database.ref(
+//            `${ref_root}/${req.params.project_id}/members`
+//        ).set(members.concat(newMembers))
 
-        await database.ref().update(
-            newMembers.reduce(
+
+
+        const data = await database.ref().update({
+            ...newMembers.reduce(
                 (updates, member) => {
                     updates[`${USER_ROOT}/${member}/projects/${req.params.project_id}`] = ''
                     return updates
                 },
                 {},
             ),
-        )
+            ...newMembers.reduce(
+                (updates, member) => {
+                    updates[`${ref_root}/${req.params.project_id}/members/${member}`] = ''
+                    return updates
+                },
+                {},
+            )
+        })
 
         await setModifiedToNow(req.params.project_id)
 
