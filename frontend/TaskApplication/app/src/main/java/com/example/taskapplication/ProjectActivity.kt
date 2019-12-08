@@ -1,14 +1,19 @@
 package com.example.taskapplication
 
+import android.app.SearchManager
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -38,7 +43,9 @@ class ProjectActivity : BaseActivity(),
     private lateinit var taskAdapter: TasksCustomAdapter
     private val taskEntries = arrayListOf<Map<String, String>>()
     private var updatingTaskList = false
-
+    // Keep track of all user IDs and usernames to enable searching for new project members.
+    private val userIds = ArrayList<String>()
+    private val usernames = ArrayList<String>()
 
     enum class PageType {
         TASKS,
@@ -100,21 +107,53 @@ class ProjectActivity : BaseActivity(),
     }
 
     override fun onFragmentInteraction(uri: Uri) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
-    // actions on click menu items
+    // Displays icons on the app/action bar.
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        // Inflate the options menu from XML.
+        menuInflater.inflate(R.menu.project_view_menu, menu)
+        return true
+    }
+
+    // Handles click actions on the app/action bar.
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
             finish()
             true
         }
+        R.id.action_search_users -> {
+            // Retrieve the list of usernames from Firebase Database.
+            readFromDatabase(database.child("usernames"), "saveUsernames")
+            true
+        }
         else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            // For example, handles expanding and shrinking the
+            // search bar when clicking on a search icon.
             super.onOptionsItemSelected(item)
         }
     }
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+    private fun searchUsernames(dataSnapshot: DataSnapshot) {
+        // Copy the usernames from the database to a local variable.
+        dataSnapshot.children.forEach{
+            userIds.add(it.value.toString())
+            usernames.add(it.key.toString())
+        }
+        // Redirect to the activity that handles searching by username.
+        val intent = Intent(this, UserSearchActivity::class.java)
+        intent.putExtra("pid", projectId)
+        intent.putExtra("userIds", userIds.toTypedArray())
+        intent.putExtra("usernames", usernames.toTypedArray())
+        startActivity(intent)
+    }
+
+    private val mOnNavigationItemSelectedListener =
+        BottomNavigationView.OnNavigationItemSelectedListener { item ->
         // Open fragment for the specific menu item
         when (item.itemId) {
             R.id.navigation_tasks -> {
@@ -159,15 +198,11 @@ class ProjectActivity : BaseActivity(),
         user!!.getIdToken(true).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val idToken = task.result!!.token!!
-                Log.d(TAG, "idToken $idToken")
                 val requestBody = mapOf(
                     "status" to status
                 )
-                Log.d(TAG, "---------- requestBody $requestBody")
                 val jsonParams = JSONObject(requestBody)
-                Log.d(TAG, "---------- jsonParams $jsonParams")
                 val entity = StringEntity(jsonParams.toString())
-                Log.d(TAG, "---------- entity $entity")
                 // PUT https://mcc-fall-2019-g09.appspot.com/project/{pid}/task/{tid}/status
                 APIClient.put(
                     applicationContext,
@@ -250,6 +285,7 @@ class ProjectActivity : BaseActivity(),
                     // A key-value pair was found at the given database path.
                     when (action) {
                         "populateTaskList" -> populateTaskList(dataSnapShot)
+                        "saveUsernames" -> searchUsernames(dataSnapShot)
                     }
                 } else {
                     // A key-value pair was not found at the given database path.

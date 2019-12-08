@@ -1,16 +1,18 @@
 package com.example.taskapplication
 
+import android.app.ListActivity
 import android.app.SearchManager
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-class SearchableActivity : BaseActivity(), View.OnClickListener {
+class SearchableActivity : ListActivity(), View.OnClickListener {
     // Declare an instance of Firebase Auth.
     private lateinit var auth: FirebaseAuth
     // Declare an instance of Firebase Realtime Database.
@@ -18,24 +20,21 @@ class SearchableActivity : BaseActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // setContentView(R.layout.search)
-        // These call findViewById on the first time, and then cache the values
-        // for faster access in subsequent calls. Clicks are handled in `onClick`.
-        // buttonChangeImgQSubmit.setOnClickListener(this)
+        setContentView(R.layout.activity_searchable)
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
-
-        // Verify the action and get the query.
+        // Verify the search action and get the query.
         if (Intent.ACTION_SEARCH == intent.action) {
             intent.getStringExtra(SearchManager.QUERY)?.also { query ->
-                doMySearch(query)
+                processSearchQuery(query)
             }
         }
     }
 
-    private fun doMySearch(query: String) {
-        // TODO: Search users/projects and return/display the results.
+    private fun processSearchQuery(query: String) {
+        // TODO: Search users and return/display the results.
+        Toast.makeText(this, "query: $query", Toast.LENGTH_SHORT).show()
     }
 
     public override fun onStart() {
@@ -46,13 +45,8 @@ class SearchableActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun updateUI(user: FirebaseUser?) {
-        hideProgressDialog()
-        if (user != null) {
-            // The user is signed in.
-            // imageQualityButtons.visibility = View.VISIBLE
-        } else {
+        if (user == null) {
             // The user is signed out, so redirect to the login page.
-            // imageQualityButtons.visibility = View.GONE
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
