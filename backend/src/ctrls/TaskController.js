@@ -2,10 +2,7 @@
 const { database } = require('../db')
 const { taskAttributesBody, taskStatusBody, assignTaskBody } = require('../schemas')
 const {
-    //getProjectAdmin,
-    //getProjectMembers,
     getProject,
-    //isGroupProject,
     notBelongsToProject,
     PROJECT_ROOT,
     setModifiedToNow,
@@ -20,6 +17,8 @@ const taskEvents = {
     updateStatus: 'task status change'
 }
 
+// For each task related event, generate an event to /projects/<project_id>/events
+// which acts as the project related history
 const generateEventsUpdates = (projectId, taskId, taskEvent, input) => {
     const rootRef = `${PROJECT_ROOT}/${projectId}/events`
     const eventId = database.ref().child(rootRef).push().key
@@ -109,7 +108,6 @@ const TaskController = {
         )
 
         await Promise.all([
-            // TODO: run in transaction?
             await database.ref().update(
                 generateEventsUpdates(req.params.project_id, req.params.task_id, taskEvents.assignment, value)
             ),
@@ -120,7 +118,6 @@ const TaskController = {
         res.status(200).json({ taskId: req.params.task_id, assignments: value.assignments })
     },
 
-    // Update task's status TODO: needs to be doable without project id?
     // PUT /project/{id}/task/{id}/status
     async updateTask(req, res) {
         const { error, value } = taskStatusBody.validate(req.body)
@@ -139,7 +136,6 @@ const TaskController = {
         const data = await database.ref(`${taskRef}/status`).set(value.status)
 
         await Promise.all([
-            // TODO: run in transaction?
             await database.ref().update(
                 generateEventsUpdates(req.params.project_id, req.params.task_id, taskEvents.updateStatus, value)
             ),
@@ -148,15 +144,6 @@ const TaskController = {
         log.debug(`TaskController.updateTask: updated ${req.params.task_id} with: ${JSON.stringify(data)}`)
         res.status(200).json({ taskId: req.params.task_id, status: value.status })
     },
-
-/*
-  // Get list of tasks
-  // GET /project/{id}/tasks
-  getAllTasks(req, res) {
-    // const projects = firebase.database().ref().child('projects');
-    // res.status(200).json({ status: 'ok', data: projects });
-  },
-*/
 }
 
 module.exports = TaskController

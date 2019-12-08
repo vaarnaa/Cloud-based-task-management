@@ -91,8 +91,8 @@ const ProjectController = {
             return res.status(403).json({ code: 403, message: 'Forbidden operation'})
         }
 
-        // TODO: delete also other related data!
         const data = await database.ref(`${ref_root}/${req.params.project_id}`).remove()
+        // Alongside project under /projects delete project from /users/<id>/projects
         await Promise.all(members.concat(admin).map(member =>
             database.ref(`${USER_ROOT}/${member}/projects/${req.params.project_id}`).remove()
         ))
@@ -147,6 +147,7 @@ const ProjectController = {
             .filter(newMember => !members.find(oldMember => oldMember === newMember))
 
         const data = await database.ref().update({
+            // Add project to /users/<id>/projects
             ...newMembers.reduce(
                 (updates, member) => {
                     updates[`${USER_ROOT}/${member}/projects/${req.params.project_id}`] = ''
@@ -154,6 +155,7 @@ const ProjectController = {
                 },
                 {},
             ),
+            // Add users to /project/<id>/members
             ...newMembers.reduce(
                 (updates, member) => {
                     updates[`${ref_root}/${req.params.project_id}/members/${member}`] = ''
