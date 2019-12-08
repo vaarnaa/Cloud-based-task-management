@@ -12,7 +12,7 @@ eslint:
     - npm run lint
 
 jest:
-  stage: first
+  stage: second
   script:
     - cd backend
     - npm install
@@ -36,7 +36,7 @@ pages:
 
 frontend:
   image: mreichelt/android:29
-  stage: second
+  stage: first
   script:
     - cd frontend/TaskApplication/
     - ./gradlew check assemble
