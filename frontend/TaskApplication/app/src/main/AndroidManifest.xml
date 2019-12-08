@@ -60,6 +60,9 @@
             android:name=".PicassoContentProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"/>
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="ocr" />
     </application>
 
 </manifest>
