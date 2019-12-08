@@ -51,7 +51,7 @@ describe_db('ProjectController', () => {
     })
     it('Add members', async () => {
         res = await request(app)
-            .put(`/project/${project_id}/members/`)
+            .post(`/project/${project_id}/members/`)
             .set(default_headers)
             .send({
                 members: [

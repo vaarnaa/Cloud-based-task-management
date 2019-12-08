@@ -54,7 +54,7 @@ app.get('/project/:project_id', ctrls.ProjectController.getSingle)
 app.delete('/project/:project_id', ctrls.ProjectController.deleteProject)
 
 // User/member related
-app.put('/project/:project_id/members', ctrls.ProjectController.attachUsers)
+app.post('/project/:project_id/members', ctrls.ProjectController.attachUsers)
 
 // Task related
 // app.get('/project/:project_id/tasks', ctrls.TaskController.getAllTasks);

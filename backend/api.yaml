@@ -169,7 +169,7 @@ paths:
   /project/{projectId}/members:
     parameters:
     - $ref: "#/parameters/projectId"
-    put:
+    post:
       operationId: "addProjectMembers"
       description: "Add members to a project"
       parameters:

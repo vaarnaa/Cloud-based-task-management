@@ -142,32 +142,31 @@ const ProjectController = {
             return res.status(403).json({ code: 403, message: 'Forbidden operation' })
         }
 
-        const newMembers = req.body.members.map(member => member.id).filter(member => member !== admin)
+        const newMembers = req.body.members.map(member => member.id)
+            .filter(member => member !== admin)
+            .filter(newMember => !members.find(oldMember => oldMember === newMember))
 
-        const deletedMembers = members.filter(member =>
-            !newMembers.find(newMember => member === newMember)
-        )
+        // const deletedMembers = members.filter(member =>
+        //    !newMembers.find(newMember => member === newMember)
+        //)
 
         const data = await database.ref(
             `${ref_root}/${req.params.project_id}/members`
-        ).set(newMembers)
+        ).set(members.concat(newMembers))
 
-        await Promise.all([
-            ...deletedMembers.map(member => database.ref(`${USER_ROOT}/${member}/projects/${req.params.project_id}`).remove()),
-            database.ref().update(
-                newMembers.reduce(
-                    (updates, member) => {
-                        updates[`${USER_ROOT}/${member}/projects/${req.params.project_id}`] = ''
-                        return updates
-                    },
-                    {},
-                ),
+        await database.ref().update(
+            newMembers.reduce(
+                (updates, member) => {
+                    updates[`${USER_ROOT}/${member}/projects/${req.params.project_id}`] = ''
+                    return updates
+                },
+                {},
             ),
-        ])
+        )
 
         await setModifiedToNow(req.params.project_id)
 
-        res.status(200).json(data)
+        res.status(200).json({ data })
     },
 }
 
