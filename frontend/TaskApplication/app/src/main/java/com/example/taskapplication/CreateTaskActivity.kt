@@ -13,6 +13,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
@@ -205,12 +206,13 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
 
     private fun pickImageFromGallery() {
         val intent = Intent(
-            Intent.ACTION_PICK,
+            Intent.ACTION_GET_CONTENT,
             MediaStore.Images.Media.INTERNAL_CONTENT_URI
         )
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "image/*"
-        intent.putExtra("aspectX", 1)
-        intent.putExtra("aspectY", 1)
+        //intent.putExtra("aspectX", 1)
+        //intent.putExtra("aspectY", 1)
         intent.putExtra("return-data", true)
         startActivityForResult(intent, IMAGE_PICK_REQUEST)
     }
@@ -236,9 +238,17 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
         if (uri != null) {
             val detector = FirebaseVision.getInstance().onDeviceTextRecognizer
             val image = FirebaseVisionImage.fromFilePath(this, uri)
-            detector.processImage(image).addOnSuccessListener { texts ->
-                et_task_description.setText(texts.text)
-            }
+            detector.processImage(image)
+                .addOnSuccessListener { texts ->
+                    Log.d(TAG, "Detected: ${texts.text}")
+                    et_task_description.setText(texts.text)
+                }
+                .addOnFailureListener {
+                    Toast.makeText(baseContext,
+                        "Could not detect text from image",
+                        Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "Could not detect text, $it")
+                }
         }
     }
 

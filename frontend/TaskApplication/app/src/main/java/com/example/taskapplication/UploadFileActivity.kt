@@ -84,7 +84,7 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                         "image/jpeg",       // .jpg (https://stackoverflow.com/a/37266399)
                         "audio/mpeg"        // .mp3 (https://stackoverflow.com/a/10688641)
                     ))
-                    //intent.putExtra("return-data", true)
+                    intent.putExtra("return-data", true)
                     startActivityForResult(intent, FILE_PICK_REQUEST)
                 }
                 "image" -> {
@@ -92,6 +92,7 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
 
                     val intent = Intent(Intent.ACTION_GET_CONTENT)
                     intent.type = "image/*"
+                    intent.putExtra("return-data", true)
                     if (intent.resolveActivity(packageManager) != null) {
                         startActivityForResult(intent, IMAGE_PICK_REQUEST)
                     }
@@ -207,11 +208,14 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                         applicationContext.contentResolver.loadThumbnail(
                         content-uri, Size(640, 480), null)
                          */
-                        val bitmap = MediaStore.Images.Media.getBitmap(
-                            contentResolver, selectedFile.toUri())
-                        imageViewPreview.setImageBitmap(bitmap)
-                        imageViewPreview.setBackgroundResource(android.R.color.transparent)
+
                         imageViewPreview.visibility = View.VISIBLE
+                        imageViewPreview.setBackgroundResource(android.R.color.transparent)
+                        PicassoProvider.get()
+                            .load(selectedFile)
+                            .resize(50, 50)
+                            .centerCrop()
+                            .into(imageViewPreview)
                     }
                 }
                 catch (e: IOException) {

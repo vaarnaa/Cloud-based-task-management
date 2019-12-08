@@ -208,12 +208,13 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
 
     private fun pickImageFromGallery() {
         val intent = Intent(
-            Intent.ACTION_PICK,
+            Intent.ACTION_GET_CONTENT,
             MediaStore.Images.Media.INTERNAL_CONTENT_URI
         )
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "image/*"
-        intent.putExtra("aspectX", 1)
-        intent.putExtra("aspectY", 1)
+        //intent.putExtra("aspectX", 1)
+        //intent.putExtra("aspectY", 1)
         intent.putExtra("return-data", true)
         startActivityForResult(intent, IMAGE_PICK_REQUEST)
     }
