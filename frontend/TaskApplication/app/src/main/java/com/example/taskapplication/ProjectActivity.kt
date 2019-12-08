@@ -138,6 +138,12 @@ class ProjectActivity : BaseActivity(),
             readFromDatabase(membersPath, "getProjectMemberNames")
             true
         }
+        R.id.action_delete_project -> {
+            // Delete project from Firebase Database.
+            // TODO: missing implementation
+            true
+        }
+
         else -> {
             // If we got here, the user's action was not recognized.
             // Invoke the superclass to handle it.

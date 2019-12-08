@@ -37,20 +37,24 @@
             android:orientation="vertical"
             android:layout_marginTop="?attr/actionBarSize">
 
+
             <ListView
                 android:id="@+id/projectTasksView"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:footerDividersEnabled="false" />
 
-            <ListView
+            <GridView
                 android:id="@+id/projectPicturesView"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:footerDividersEnabled="false" />
+                android:layout_height="fill_parent"
+                android:columnWidth="150dp"
+                android:horizontalSpacing="10dp"
+                android:numColumns="auto_fit"
+                android:verticalSpacing="10dp" />
 
             <ListView
-                android:id="@+id/projectImagesView"
+                android:id="@+id/projectFilesView"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:footerDividersEnabled="false" />

@@ -59,6 +59,9 @@
     <string name="add_users_hint">Add users to project</string>
     <string name="search_users_hint">Search users (3 characters required)</string>
     <string name="show_members_hint">Show project members</string>
+    <string name="title_create_task">Create task</string>
+    <string name="description_from_image">Description from image</string>
+    <string name="delete_project">Delete project</string>
 
     <string-array name="image_quality_array">
         <item>Full (original size)</item>
