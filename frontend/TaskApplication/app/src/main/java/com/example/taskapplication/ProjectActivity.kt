@@ -11,6 +11,7 @@ import android.widget.AdapterView
 import android.widget.GridView
 import android.widget.ListView
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -232,11 +233,17 @@ class ProjectActivity : BaseActivity(),
                         ) {
                             // Called when response HTTP status is "200 OK".
                             Log.d(TAG, "deleteProject:APIClient:onSuccess")
+
+                            // async deletion of files
+                            deleteFilesFromStorage()
+
+                            // Redirect now, files are removed in the background
                             Toast.makeText(applicationContext,
                                 "Project deleted successfully", Toast.LENGTH_SHORT).show()
                             // Redirect to the project list page after successful deletion.
                             val intent = Intent(applicationContext, ProjectsActivity::class.java)
                             startActivity(intent)
+
                         }
                         override fun onFailure(
                             statusCode: Int,
@@ -486,6 +493,45 @@ class ProjectActivity : BaseActivity(),
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun deleteFilesFromStorage() {
+        val filesRef = storage.reference.child("project_files/$projectId/files")
+        val imagesRef = storage.reference.child("project_files/$projectId/images")
+
+        // NB, firebase storage does not have functionality to
+        //   (1) delete whole folders,
+        //   (2) list files recursively
+        // so we do what we can here
+
+        Log.d(TAG, "removing files from storage")
+
+        filesRef.listAll()
+            .addOnSuccessListener { taskSnapshot ->
+                Log.d(TAG, "filesref success, removing items: ${taskSnapshot.items}")
+                taskSnapshot.items.forEach {
+                    it.delete().addOnFailureListener { exception ->
+                        Log.e(TAG, "filesRef single exception: $exception")
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "filesref exception: $exception")
+            }
+
+        imagesRef.listAll()
+            .addOnSuccessListener { taskSnapshot ->
+                Log.d(TAG, "imagesRef success, removing items: ${taskSnapshot.items}")
+                taskSnapshot.items.forEach {
+                    it.delete().addOnFailureListener { exception ->
+                        Log.e(TAG, "imagesRef single exception: $exception")
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "imagesRef exception: $exception")
+            }
+
     }
 
     private fun updateFilesFromStorage() {
