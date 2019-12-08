@@ -25,7 +25,7 @@ const default_headers = {
 const describe_db = (process.env.GOOGLE_APPLICATION_CREDENTIALS ? describe : describe.skip)
 
 describe_db('ProjectController', () => {
-    let res, project_id, task_id
+    let res, project_id
     it('Create new project', async () => {
         res = await request(app)
             .post('/project')
@@ -90,9 +90,9 @@ describe_db('ProjectController', () => {
     })
 })
 
-describe_db("TaskController", () => {
+describe_db('TaskController', () => {
     let res, project_id, task_id
-    it('Create new project', async () => {
+    it('Create a project for tasks', async () => {
         res = await request(app)
             .post('/project')
             .set(default_headers)
