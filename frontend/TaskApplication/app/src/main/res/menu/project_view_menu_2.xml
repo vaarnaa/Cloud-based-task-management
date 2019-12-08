@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_search_users"
+        android:title="@string/add_users_hint"
+        app:showAsAction="never"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <item
+        android:id="@+id/action_show_project_members"
+        android:title="@string/show_members_hint"
+        app:showAsAction="never"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+</menu>

@@ -1,8 +1,5 @@
 package com.example.taskapplication
 
-import android.app.SearchManager
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,7 +10,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
-import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -39,6 +35,7 @@ class ProjectActivity : BaseActivity(),
     lateinit var projectId: String
     lateinit var projectName: String
     lateinit var projectType: String
+    private var isProjectAdmin = false
     // Declare an instance of ListView to display the list of tasks.
     private lateinit var tasksListView: ListView
     private lateinit var taskAdapter: TasksCustomAdapter
@@ -115,8 +112,15 @@ class ProjectActivity : BaseActivity(),
 
     // Displays icons on the app/action bar.
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        // Inflate the options menu from XML if this is a group project.
-        if (projectType == "group") menuInflater.inflate(R.menu.project_view_menu, menu)
+        // Inflate the options menu from XML.
+        if (projectType == "group") {
+            if (isProjectAdmin) // Add members, show members, and delete project menu items.
+                menuInflater.inflate(R.menu.project_view_menu_3, menu)
+            else // Add members and show members menu items.
+                menuInflater.inflate(R.menu.project_view_menu_2, menu)
+        } else { // Delete project menu item.
+            menuInflater.inflate(R.menu.project_view_menu_1, menu)
+        }
         return true
     }
 
@@ -139,8 +143,13 @@ class ProjectActivity : BaseActivity(),
             true
         }
         R.id.action_delete_project -> {
-            // Delete project from Firebase Database.
-            // TODO: missing implementation
+            // Delete project from Firebase Database if the user is the project admin.
+            if (isProjectAdmin) {
+                deleteProject(projectId)
+            } else {
+                Toast.makeText(applicationContext,
+                    "You need to be the project admin to delete it", Toast.LENGTH_SHORT).show()
+            }
             true
         }
 
@@ -153,11 +162,65 @@ class ProjectActivity : BaseActivity(),
         }
     }
 
+    private fun deleteProject(projectId: String) {
+        // Delete the given project by using our API.
+        showProgressDialog()
+        val user = auth.currentUser
+        user!!.getIdToken(true).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val idToken = task.result!!.token!!
+                val requestBody = mapOf<String, String>()
+                val jsonParams = JSONObject(requestBody)
+                val entity = StringEntity(jsonParams.toString())
+                // DELETE https://mcc-fall-2019-g09.appspot.com/project/{projectId}
+                APIClient.delete(
+                    applicationContext,
+                    "project/$projectId",
+                    idToken,
+                    entity,
+                    ContentType.APPLICATION_JSON.mimeType,
+                    object : JsonHttpResponseHandler() {
+                        override fun onSuccess(
+                            statusCode: Int,
+                            headers: Array<out Header>?,
+                            response: JSONObject
+                        ) {
+                            // Called when response HTTP status is "200 OK".
+                            Log.d(TAG, "deleteProject:APIClient:onSuccess")
+                            Toast.makeText(applicationContext,
+                                "Project deleted successfully", Toast.LENGTH_SHORT).show()
+                            // Redirect to the project list page after successful deletion.
+                            val intent = Intent(applicationContext, ProjectsActivity::class.java)
+                            startActivity(intent)
+                        }
+                        override fun onFailure(
+                            statusCode: Int,
+                            headers: Array<out Header>?,
+                            error: Throwable?,
+                            data: JSONObject
+                        ) {
+                            // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
+                            Log.d(TAG, "deleteProject:APIClient:onFailure")
+                            Log.d(TAG, "statusCode $statusCode")
+                            Log.d(TAG, "headers ${headers?.forEach(::println)}")
+                            Log.d(TAG, "data ${data.toString(2)}")
+                            Log.d(TAG, "error $error")
+                            Toast.makeText(applicationContext,
+                                "Deleting project failed", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+            } else {
+                // Handle error -> task.getException();
+            }
+            hideProgressDialog()
+        }
+    }
+
     private fun getProjectMemberNames(dataSnapshot: DataSnapshot) {
         val pm = arrayListOf<String>()
         Log.d(TAG, "------------------ GET NAMES START dataSnapshot: $dataSnapshot")
         dataSnapshot.children.forEach {
-            val uid = it.value.toString()
+            val uid = it.key.toString()
             pm.add(uid)
         }
         projectMembers = pm
@@ -186,6 +249,8 @@ class ProjectActivity : BaseActivity(),
 
     private fun searchUsernames(dataSnapshot: DataSnapshot) {
         // Copy the usernames from the database to a local variable.
+        userIds.clear()
+        usernames.clear()
         dataSnapshot.children.forEach{
             userIds.add(it.value.toString())
             usernames.add(it.key.toString())
@@ -363,6 +428,7 @@ class ProjectActivity : BaseActivity(),
             projectId = intent.extras?.getString("pid")!!
             projectName = intent.extras?.getString("name")!!
             projectType = intent.extras?.getString("type")!!
+            isProjectAdmin = intent.extras?.getBoolean("isProjectAdmin")!!
             supportActionBar?.setTitle(projectName)
             val projectPath = database.child("projects").child(projectId)
             val tasksPath = projectPath.child("tasks")

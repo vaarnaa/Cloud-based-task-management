@@ -50,10 +50,13 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
                 val pid = customAdapter.getItem(position)!!.getValue("pid")
                 val name = customAdapter.getItem(position)!!.getValue("name")
                 val type = customAdapter.getItem(position)!!.getValue("type")
+                val admin = customAdapter.getItem(position)!!.getValue("admin")
+                val isProjectAdmin = auth.currentUser?.uid == admin
                 val intent = Intent(this, ProjectActivity::class.java)
                 intent.putExtra("pid", pid)
                 intent.putExtra("name", name)
                 intent.putExtra("type", type)
+                intent.putExtra("isProjectAdmin", isProjectAdmin)
                 startActivity(intent)
             }
         // Initialize Firebase instances.
@@ -106,11 +109,13 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         val name = projects.child("name").value.toString()
         val modified = projects.child("modified").value.toString()
         val type = projects.child("type").value.toString()
+        val admin = projects.child("admin").value.toString()
         val projectMap = mapOf(
             "pid" to pid,
             "name" to name,
             "modified" to modified,
-            "type" to type)
+            "type" to type,
+            "admin" to admin)
 
         Log.d(TAG, "pid: $pid name: $name modified: $modified")
 
@@ -131,54 +136,6 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         // Refresh the project list view.
         customAdapter.notifyDataSetChanged()
         Log.d(TAG, "projectEntries:${projectEntries.toTypedArray().contentToString()}")
-    }
-
-    private fun deleteProject(projectId: String) {
-        // Delete the given project by using our API.
-        showProgressDialog()
-        val user = auth.currentUser
-        user!!.getIdToken(true).addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val idToken = task.result!!.token!!
-                val requestBody = mapOf<String, String>()
-                val jsonParams = JSONObject(requestBody)
-                val entity = StringEntity(jsonParams.toString())
-                // DELETE https://mcc-fall-2019-g09.appspot.com/project/{projectId}
-                APIClient.delete(
-                    applicationContext,
-                    "project/$projectId",
-                    idToken,
-                    entity,
-                    ContentType.APPLICATION_JSON.mimeType,
-                    object : JsonHttpResponseHandler() {
-                        override fun onSuccess(
-                            statusCode: Int,
-                            headers: Array<out Header>?,
-                            response: JSONObject
-                        ) {
-                            // Called when response HTTP status is "200 OK".
-                            Log.d(TAG, "deleteProject:APIClient:onSuccess")
-                            updateUI(user)
-                        }
-                        override fun onFailure(
-                            statusCode: Int,
-                            headers: Array<out Header>?,
-                            error: Throwable?,
-                            data: JSONObject
-                        ) {
-                            // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
-                            Log.d(TAG, "deleteProject:APIClient:onFailure")
-                            Log.d(TAG, "statusCode $statusCode")
-                            Log.d(TAG, "headers ${headers?.forEach(::println)}")
-                            Log.d(TAG, "data ${data.toString(2)}")
-                            Log.d(TAG, "error $error")
-                        }
-                    })
-            } else {
-                // Handle error -> task.getException();
-            }
-            hideProgressDialog()
-        }
     }
 
     private fun readFromDatabase(dbPath: DatabaseReference, action: String) {
