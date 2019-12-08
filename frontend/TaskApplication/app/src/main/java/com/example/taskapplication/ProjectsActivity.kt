@@ -159,8 +159,6 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
             override fun onCancelled(databaseError: DatabaseError) {
                 // An error occurred (probably due to incorrect Firebase Database rules).
                 Log.d(TAG, "readFromDatabase:onCancelled: $databaseError")
-                Toast.makeText(baseContext, "Error while reading from database",
-                    Toast.LENGTH_SHORT).show()
             }
         }
         // Attach the listener to the given database path.
