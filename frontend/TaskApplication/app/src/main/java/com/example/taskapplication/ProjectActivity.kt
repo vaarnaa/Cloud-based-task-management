@@ -46,6 +46,7 @@ class ProjectActivity : BaseActivity(),
     // Keep track of all user IDs and usernames to enable searching for new project members.
     private val userIds = ArrayList<String>()
     private val usernames = ArrayList<String>()
+    private lateinit var projectMembers: ArrayList<String>
 
     enum class PageType {
         TASKS,
@@ -126,7 +127,14 @@ class ProjectActivity : BaseActivity(),
         }
         R.id.action_search_users -> {
             // Retrieve the list of usernames from Firebase Database.
-            readFromDatabase(database.child("usernames"), "saveUsernames")
+            readFromDatabase(database.child("usernames"), "searchUsernames")
+            true
+        }
+        R.id.action_show_project_members -> {
+            // Retrieve the list of project members from Firebase Database.
+            val projectPath = database.child("projects").child(projectId)
+            val membersPath = projectPath.child("members")
+            readFromDatabase(membersPath, "getProjectMemberNames")
             true
         }
         else -> {
@@ -136,6 +144,36 @@ class ProjectActivity : BaseActivity(),
             // search bar when clicking on a search icon.
             super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun getProjectMemberNames(dataSnapshot: DataSnapshot) {
+        val pm = arrayListOf<String>()
+        dataSnapshot.children.forEach {
+            val uid = it.value.toString()
+            pm.add(uid)
+        }
+        projectMembers = pm
+        val usernamesPath = database.child("usernames")
+        readFromDatabase(usernamesPath, "showProjectMembers")
+    }
+
+    private fun showProjectMembers(dataSnapshot: DataSnapshot) {
+        Log.d(TAG, "------------------ dataSnapshot: $dataSnapshot")
+        Log.d(TAG, "------------------ projectMembers BEFORE: $projectMembers")
+        dataSnapshot.children.forEach {
+            val username = it.key.toString()
+            if (projectMembers.contains(it.value.toString())) {
+                projectMembers.remove(it.value.toString())
+                projectMembers.add(username)
+            } else {
+                projectMembers.remove(it.value.toString())
+            }
+        }
+        Log.d(TAG, "------------------ projectMembers AFTER: $projectMembers")
+        // Redirect to the activity that shows a list of project members.
+        val intent = Intent(this, ProjectMembersActivity::class.java)
+        intent.putExtra("usernames", projectMembers.toTypedArray())
+        startActivity(intent)
     }
 
     private fun searchUsernames(dataSnapshot: DataSnapshot) {
@@ -285,7 +323,9 @@ class ProjectActivity : BaseActivity(),
                     // A key-value pair was found at the given database path.
                     when (action) {
                         "populateTaskList" -> populateTaskList(dataSnapShot)
-                        "saveUsernames" -> searchUsernames(dataSnapShot)
+                        "searchUsernames" -> searchUsernames(dataSnapShot)
+                        "getProjectMemberNames" -> getProjectMemberNames(dataSnapShot)
+                        "showProjectMembers" -> showProjectMembers(dataSnapShot)
                     }
                 } else {
                     // A key-value pair was not found at the given database path.

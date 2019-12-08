@@ -37,8 +37,6 @@ class UserSearchActivity : BaseActivity(), View.OnClickListener {
     // ArrayAdapter used to manage individual search results.
     private lateinit var adapter: ArrayAdapter<String>
     private val minInputLength = 3
-    private val emptyResult = "Give at least $minInputLength characters to see the results."
-    private val displayedUsernames = arrayListOf(emptyResult)
     // An arbitrary filter string to display empty search results.
     private val emptyFilter = "204596i02459630495683049568304956"
 
@@ -52,6 +50,7 @@ class UserSearchActivity : BaseActivity(), View.OnClickListener {
         projectId = intent.extras?.getString("pid")!!
         userIds = intent.extras?.getStringArray("userIds")!!
         usernames = intent.extras?.getStringArray("usernames")!!
+        Log.d(TAG, "-------- SEARCH usernames: ${usernames.contentToString()}")
         usersMap = usernames.zip(userIds).toMap()
         lv = list_view
         adapter = ArrayAdapter(applicationContext, R.layout.activity_user_search_item,
@@ -96,8 +95,8 @@ class UserSearchActivity : BaseActivity(), View.OnClickListener {
                 )
                 val jsonParams = JSONObject(requestBody)
                 val entity = StringEntity(jsonParams.toString())
-                // PUT https://mcc-fall-2019-g09.appspot.com/project/{projectId}/members
-                APIClient.put(
+                // POST https://mcc-fall-2019-g09.appspot.com/project/{projectId}/members
+                APIClient.post(
                     applicationContext,
                     "project/$projectId/members",
                     idToken,
