@@ -11,7 +11,12 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import com.loopj.android.http.JsonHttpResponseHandler
+import cz.msebera.android.httpclient.Header
+import cz.msebera.android.httpclient.entity.ContentType
+import cz.msebera.android.httpclient.entity.StringEntity
 import kotlinx.android.synthetic.main.activity_projects.*
+import org.json.JSONObject
 
 class ProjectsActivity : BaseActivity(), View.OnClickListener  {
     // Declare an instance of Firebase Auth.
@@ -128,6 +133,54 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         Log.d(TAG, "projectEntries:${projectEntries.toTypedArray().contentToString()}")
     }
 
+    private fun deleteProject(projectId: String) {
+        // Delete the given project by using our API.
+        showProgressDialog()
+        val user = auth.currentUser
+        user!!.getIdToken(true).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val idToken = task.result!!.token!!
+                val requestBody = mapOf<String, String>()
+                val jsonParams = JSONObject(requestBody)
+                val entity = StringEntity(jsonParams.toString())
+                // DELETE https://mcc-fall-2019-g09.appspot.com/project/{projectId}
+                APIClient.delete(
+                    applicationContext,
+                    "project/$projectId",
+                    idToken,
+                    entity,
+                    ContentType.APPLICATION_JSON.mimeType,
+                    object : JsonHttpResponseHandler() {
+                        override fun onSuccess(
+                            statusCode: Int,
+                            headers: Array<out Header>?,
+                            response: JSONObject
+                        ) {
+                            // Called when response HTTP status is "200 OK".
+                            Log.d(TAG, "deleteProject:APIClient:onSuccess")
+                            updateUI(user)
+                        }
+                        override fun onFailure(
+                            statusCode: Int,
+                            headers: Array<out Header>?,
+                            error: Throwable?,
+                            data: JSONObject
+                        ) {
+                            // Called when response HTTP status is "4XX" (eg. 401, 403, 404).
+                            Log.d(TAG, "deleteProject:APIClient:onFailure")
+                            Log.d(TAG, "statusCode $statusCode")
+                            Log.d(TAG, "headers ${headers?.forEach(::println)}")
+                            Log.d(TAG, "data ${data.toString(2)}")
+                            Log.d(TAG, "error $error")
+                        }
+                    })
+            } else {
+                // Handle error -> task.getException();
+            }
+            hideProgressDialog()
+        }
+    }
+
     private fun readFromDatabase(dbPath: DatabaseReference, action: String) {
         // Create a listener to be able to read from the database.
         val listener = object : ValueEventListener {
@@ -166,7 +219,6 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
             // The user is signed in, so fetch all projects here, sorted by modification date.
             // For each, show modification date, media icon, and up to 3 profile images.
             readFromDatabase(userProjectsPath, "fetchProjects")
-
         } else {
             // The user is signed out, so redirect to the login page.
             val intent = Intent(this, MainActivity::class.java)
