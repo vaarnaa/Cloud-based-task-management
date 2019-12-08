@@ -43,7 +43,9 @@ class ProjectActivity : BaseActivity(),
     private lateinit var taskAdapter: TasksCustomAdapter
     private val taskEntries = arrayListOf<Map<String, String>>()
     private var updatingTaskList = false
-
+    // Keep track of all user IDs and usernames to enable searching for new project members.
+    private val userIds = ArrayList<String>()
+    private val usernames = ArrayList<String>()
 
     enum class PageType {
         TASKS,
@@ -109,21 +111,10 @@ class ProjectActivity : BaseActivity(),
         TODO("not implemented")
     }
 
-    // Displays a search icon on the app/action bar.
+    // Displays icons on the app/action bar.
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         // Inflate the options menu from XML.
         menuInflater.inflate(R.menu.project_view_menu, menu)
-        // Get the SearchView and set the searchable configuration.
-        val searchItem = menu?.findItem(R.id.action_search_users)
-        val searchView = searchItem?.actionView as SearchView
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        searchView.apply {
-            // Enable assisted search for this SearchView.
-            // Deliver search queries to SearchableActivity.
-            setSearchableInfo(searchManager.getSearchableInfo(ComponentName(
-                "com.example.taskapplication",
-                "com.example.taskapplication.SearchableActivity")))
-        }
         return true
     }
 
@@ -133,13 +124,32 @@ class ProjectActivity : BaseActivity(),
             finish()
             true
         }
+        R.id.action_search_users -> {
+            // Retrieve the list of usernames from Firebase Database.
+            readFromDatabase(database.child("usernames"), "saveUsernames")
+            true
+        }
         else -> {
             // If we got here, the user's action was not recognized.
             // Invoke the superclass to handle it.
             // For example, handles expanding and shrinking the
-            // search bar when clicking on the search icon.
+            // search bar when clicking on a search icon.
             super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun searchUsernames(dataSnapshot: DataSnapshot) {
+        // Copy the usernames from the database to a local variable.
+        dataSnapshot.children.forEach{
+            userIds.add(it.value.toString())
+            usernames.add(it.key.toString())
+        }
+        // Redirect to the activity that handles searching by username.
+        val intent = Intent(this, UserSearchActivity::class.java)
+        intent.putExtra("pid", projectId)
+        intent.putExtra("userIds", userIds.toTypedArray())
+        intent.putExtra("usernames", usernames.toTypedArray())
+        startActivity(intent)
     }
 
     private val mOnNavigationItemSelectedListener =
@@ -185,15 +195,11 @@ class ProjectActivity : BaseActivity(),
         user!!.getIdToken(true).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val idToken = task.result!!.token!!
-                Log.d(TAG, "idToken $idToken")
                 val requestBody = mapOf(
                     "status" to status
                 )
-                Log.d(TAG, "---------- requestBody $requestBody")
                 val jsonParams = JSONObject(requestBody)
-                Log.d(TAG, "---------- jsonParams $jsonParams")
                 val entity = StringEntity(jsonParams.toString())
-                Log.d(TAG, "---------- entity $entity")
                 // PUT https://mcc-fall-2019-g09.appspot.com/project/{pid}/task/{tid}/status
                 APIClient.put(
                     applicationContext,
@@ -276,6 +282,7 @@ class ProjectActivity : BaseActivity(),
                     // A key-value pair was found at the given database path.
                     when (action) {
                         "populateTaskList" -> populateTaskList(dataSnapShot)
+                        "saveUsernames" -> searchUsernames(dataSnapShot)
                     }
                 } else {
                     // A key-value pair was not found at the given database path.

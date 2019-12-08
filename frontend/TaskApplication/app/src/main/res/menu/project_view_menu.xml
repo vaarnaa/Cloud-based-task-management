@@ -3,10 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_search_users"
+    <item
+        android:id="@+id/action_search_users"
         android:title="@string/add_users_hint"
-        android:icon="@drawable/ic_action_search"
-        app:showAsAction="ifRoom|collapseActionView"
+        app:showAsAction="never"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
 </menu>
