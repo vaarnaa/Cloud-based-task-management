@@ -6,11 +6,17 @@
     4. `sudo systemctl enable docker`
 2. `docker build . -t mcc:infra`
 3. `docker run -it --name gcloud-config mcc:infra gcloud init`
-4. Follow the wizard: go to the link, authenticate, enter the provided verification code, pick `mcc-fall-2019-g09` as the cloud project to use, and select `n` for default compute region.
-5. `docker run -it mcc:infra firebase login:ci --no-localhost`
-6. Follow the wizard and log in.
-7. Save the output token in ./firebase/token.txt
-8. `docker run --rm -it --volumes-from gcloud-config -v ${PWD}/..:/mcc mcc:infra bash` starts an interactive shell inside an mcc:infra container with the repository and gcloud config mounted. Deployments can thereafter be done, e.g. `cd /mcc && ./deploy.sh`
+    Follow the wizard:
+    1. go to the link
+    2. authenticate
+    3. enter the provided verification code
+    4. pick `mcc-fall-2019-g09` as the cloud project to use
+    5. select `n` for default compute region.
+4. `docker run -it mcc:infra firebase login:ci --no-localhost`
+    Follow the wizard:
+    1. log in
+    2. save the output token in ./firebase/token.txt
+5. `docker run --rm -it --volumes-from gcloud-config -v ${PWD}/..:/mcc mcc:infra bash` starts an interactive shell inside an mcc:infra container with the repository and gcloud config mounted. Deployments can thereafter be done, e.g. `cd /mcc && ./deploy.sh`
 
 
 ## Firebase deployment
