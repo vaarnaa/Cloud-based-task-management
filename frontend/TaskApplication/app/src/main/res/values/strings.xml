@@ -58,6 +58,7 @@
     <string name="search_projects_hint">Search projects</string>
     <string name="add_users_hint">Add users to project</string>
     <string name="search_users_hint">Search users (3 characters required)</string>
+    <string name="show_members_hint">Show project members</string>
 
     <string-array name="image_quality_array">
         <item>Full (original size)</item>
