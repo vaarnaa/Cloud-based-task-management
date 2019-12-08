@@ -1,14 +1,14 @@
 'use strict'
-const firebase = require('firebase')
+const admin = require('firebase-admin')
 const env = require('./env')
 const log = require('./log')
 
-if (firebase.apps.length === 0)
+if (admin.apps.length === 0)
 {
-    const app = firebase.initializeApp(env.firebase)
+    const app = admin.initializeApp(env.firebase)
     log.info(`Firebase initialized, app: ${app.name}`)
 }
 
 module.exports = {
-    database: firebase.database(),
+    database: admin.database(),
 }

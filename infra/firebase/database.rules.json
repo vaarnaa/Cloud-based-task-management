@@ -3,8 +3,11 @@
     "projects": {
       "$pid": {
         // TODO: Check for auth !== null before auth.uid to prevent bugs.
-        ".read": true,
-        ".write": true
+        ".read": "
+            auth !== null &&
+        	(data.child('admin').val() === auth.uid ||
+        	data.child('members').hasChildren([auth.uid]))",
+        ".write": false
       }
     },
     // Keep track of created usernames and uids to ensure uniqueness.

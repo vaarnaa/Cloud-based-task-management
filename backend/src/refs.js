@@ -3,6 +3,7 @@ const log = require('./log')
 const { database } = require('./db')
 
 const PROJECT_ROOT = '/projects'
+const USER_ROOT    = '/users'
 
 const resolveRef = async (ref) => {
     const snapshot = await database.ref(ref).once('value')
@@ -17,7 +18,10 @@ const getProjectAdmin = async (projectId) => {
     return res
 }
 
-const getProjectMembers = (projectId) => resolveRef(`${PROJECT_ROOT}/${projectId}/members`)
+const getProjectMembers = async (projectId) => {
+    const res = await resolveRef(`${PROJECT_ROOT}/${projectId}/members`)
+    return res || []
+}
 const isGroupProject = async (projectId) => {
     const val = await resolveRef(`${PROJECT_ROOT}/${projectId}/type`)
     return val === 'group'
@@ -46,6 +50,7 @@ module.exports = {
     belongsToProject,
     notBelongsToProject,
     getProject,
+    USER_ROOT,
     setModifiedToNow,
     PROJECT_ROOT,
 }
