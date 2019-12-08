@@ -9,6 +9,7 @@ const {
     notBelongsToProject,
     PROJECT_ROOT,
     setModifiedToNow,
+    taskExists,
 } = require('../refs')
 const { invalidInput } = require('../errors')
 const log = require('../log')
@@ -89,7 +90,8 @@ const TaskController = {
 
         const { admin, type } = await getProject(req.params.project_id) || { }
 
-        if (admin !== req.auth_user.id || type !== 'group') {
+        if (admin !== req.auth_user.id || type !== 'group' ||
+            !(await taskExists(req.params.project_id, req.params.task_id))) {
             return res.status(403).json({
                 code: 403, message: 'Forbidden operation'
             })
@@ -128,7 +130,8 @@ const TaskController = {
 
         // TODO: project not found? or just get rid of the 404 altogether from everywhere?
 
-        if (await notBelongsToProject(req.auth_user.id, req.params.project_id)) {
+        if (await notBelongsToProject(req.auth_user.id, req.params.project_id) ||
+            !(await taskExists(req.params.project_id, req.params.task_id))) {
             return res.status(403).json({ code: 403, message: 'Forbidden operation' })
         }
 

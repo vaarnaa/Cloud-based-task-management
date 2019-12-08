@@ -42,6 +42,12 @@ const setModifiedToNow = async (projectId) => {
     await database.ref().update({ [ref]: new Date() })
 }
 
+const taskExists = async (projectId, taskId) => {
+    const ref = `${PROJECT_ROOT}/${projectId}/tasks/${taskId}`
+    const task = await resolveRef(ref)
+    return task != null
+}
+
 module.exports = {
     resolveRef,
     getProjectMembers,
@@ -49,6 +55,7 @@ module.exports = {
     isGroupProject,
     belongsToProject,
     notBelongsToProject,
+    taskExists,
     getProject,
     USER_ROOT,
     setModifiedToNow,
