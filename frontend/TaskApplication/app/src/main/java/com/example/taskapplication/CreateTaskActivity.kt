@@ -3,20 +3,31 @@ package com.example.taskapplication
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
+import android.text.Editable
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
+import android.widget.ImageView
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ml.vision.FirebaseVision
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.loopj.android.http.JsonHttpResponseHandler
 import cz.msebera.android.httpclient.Header
 import cz.msebera.android.httpclient.entity.ContentType
 import cz.msebera.android.httpclient.entity.StringEntity
 import kotlinx.android.synthetic.main.activity_create_task.*
 import org.json.JSONObject
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.util.*
@@ -31,6 +42,9 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
     private lateinit var projectName: String
     // Keep track of the user-set deadline for the task.
     private lateinit var deadline: LocalDateTime
+    private lateinit var  imageView: ImageView
+    private lateinit var buttonAddImage: Button
+    var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +58,10 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
         // Initialize Firebase instances.
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
+        imageView = findViewById(R.id.descriptionImage)
+        buttonAddImage = findViewById(R.id.buttonAddImage)
+        buttonAddImage.setOnClickListener(this)
+
     }
 
     override fun onStart() {
@@ -185,15 +203,56 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
         }
     }
 
+    private fun pickImageFromGallery() {
+        val intent = Intent(
+            Intent.ACTION_PICK,
+            MediaStore.Images.Media.INTERNAL_CONTENT_URI
+        )
+        intent.type = "image/*"
+        intent.putExtra("aspectX", 1)
+        intent.putExtra("aspectY", 1)
+        intent.putExtra("return-data", true)
+        startActivityForResult(intent, IMAGE_PICK_REQUEST)
+    }
+
+    public override fun onActivityResult(requestCode:Int, resultCode:Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1000) {
+            if (data != null) {
+                try {
+                    Log.i(TAG, "Image loaded")
+                    imageUri = data?.data
+                    imageView.setImageURI(imageUri)
+                    detectDescription()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    private fun detectDescription() {
+        val uri = imageUri
+        if (uri != null) {
+            val detector = FirebaseVision.getInstance().onDeviceTextRecognizer
+            val image = FirebaseVisionImage.fromFilePath(this, uri)
+            detector.processImage(image).addOnSuccessListener { texts ->
+                et_task_description.setText(texts.text)
+            }
+        }
+    }
+
     override fun onClick(v: View) {
         when (v.id) {
             R.id.buttonSaveTask -> saveTask()
             R.id.buttonSetTaskDeadline -> pickDeadline()
+            R.id.buttonAddImage -> pickImageFromGallery()
         }
     }
 
     companion object {
         // Used for printing debug messages. Usage: Log.d(TAG, "message")
         private const val TAG = "CreateTaskActivity"
+        const val IMAGE_PICK_REQUEST = 1000
     }
 }

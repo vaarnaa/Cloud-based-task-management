@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:gravity="center">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
@@ -21,6 +21,23 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <ImageView
+        android:id="@+id/descriptionImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20sp"
+        android:background="@color/colorPrimary"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"/>
+
+    <Button
+        android:id="@+id/buttonAddImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:text="@string/description_from_image"/>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,7 +46,7 @@
         android:layout_margin="20dp">
 
 
-
+        <!--
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -44,9 +61,9 @@
                 android:textSize="40sp"
                 android:gravity="center_horizontal"
                 android:text="@string/create_task" />
-             
 
         </LinearLayout>
+        -->
 
         <LinearLayout
             android:id="@+id/taskFields"
