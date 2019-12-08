@@ -11,6 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
+import android.widget.GridView
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
@@ -51,7 +52,7 @@ class ProjectActivity : BaseActivity(),
     private var updatingTaskList = false
 
     // Declare an instance of ListView to display the list of tasks.
-    private lateinit var imagesListView: ListView
+    private lateinit var imagesGridView: GridView
     private lateinit var imagesAdapter: ImagesCustomAdapter
     private val imageEntries = arrayListOf<Map<String, String>>()
     private var updatingImageList = false
@@ -95,9 +96,9 @@ class ProjectActivity : BaseActivity(),
 
         // Initialize the image list and the adapter used to populate it.
         imagesAdapter = ImagesCustomAdapter(applicationContext, imageEntries)
-        imagesListView = projectPicturesView
-        imagesListView.adapter = imagesAdapter
-        imagesListView.onItemClickListener = itemClickHandler("images")
+        imagesGridView = projectPicturesView
+        imagesGridView.adapter = imagesAdapter
+        imagesGridView.onItemClickListener = itemClickHandler("images")
 
         // Initialize the file list and the adapter used to populate it.
         filesAdapter = FilesCustomAdapter(applicationContext, filesEntries)
@@ -250,21 +251,21 @@ class ProjectActivity : BaseActivity(),
                 currentPage = PageType.TASKS
                 //Toast.makeText(this, "Tasks clicked", Toast.LENGTH_SHORT).show()
                 tasksListView.visibility = View.VISIBLE
-                imagesListView.visibility = View.GONE
+                imagesGridView.visibility = View.GONE
                 filesListView.visibility = View.GONE
             }
             R.id.navigation_pictures -> {
                 currentPage = PageType.IMAGES
                 //Toast.makeText(this, "Pictures clicked", Toast.LENGTH_SHORT).show()
                 tasksListView.visibility = View.GONE
-                imagesListView.visibility = View.VISIBLE
+                imagesGridView.visibility = View.VISIBLE
                 filesListView.visibility = View.GONE
             }
             R.id.navigation_files -> {
                 currentPage = PageType.FILES
                 //Toast.makeText(this,"Files clicked", Toast.LENGTH_SHORT).show()
                 tasksListView.visibility = View.GONE
-                imagesListView.visibility = View.GONE
+                imagesGridView.visibility = View.GONE
                 filesListView.visibility = View.VISIBLE
             }
             else -> {
