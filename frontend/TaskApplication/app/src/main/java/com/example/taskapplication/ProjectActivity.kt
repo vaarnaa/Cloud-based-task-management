@@ -1,14 +1,19 @@
 package com.example.taskapplication
 
+import android.app.SearchManager
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -100,21 +105,45 @@ class ProjectActivity : BaseActivity(),
     }
 
     override fun onFragmentInteraction(uri: Uri) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
     }
 
-    // actions on click menu items
+    // Displays a search icon on the app/action bar.
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        // Inflate the options menu from XML.
+        menuInflater.inflate(R.menu.project_view_menu, menu)
+        // Get the SearchView and set the searchable configuration.
+        val searchItem = menu?.findItem(R.id.action_search_users)
+        val searchView = searchItem?.actionView as SearchView
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        searchView.apply {
+            // Enable assisted search for this SearchView.
+            // Deliver search queries to SearchableActivity.
+            setSearchableInfo(searchManager.getSearchableInfo(ComponentName(
+                "com.example.taskapplication",
+                "com.example.taskapplication.SearchableActivity")))
+        }
+        return true
+    }
+
+    // Handles click actions on the app/action bar.
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
             finish()
             true
         }
         else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            // For example, handles expanding and shrinking the
+            // search bar when clicking on the search icon.
             super.onOptionsItemSelected(item)
         }
     }
 
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+    private val mOnNavigationItemSelectedListener =
+        BottomNavigationView.OnNavigationItemSelectedListener { item ->
         // Open fragment for the specific menu item
         when (item.itemId) {
             R.id.navigation_tasks -> {

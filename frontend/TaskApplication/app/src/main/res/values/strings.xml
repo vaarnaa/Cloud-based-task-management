@@ -56,7 +56,7 @@
     <string name="tv_file_information_placeholder">[Information placeholder]</string>
     <string name="tv_upload_progress">Upload progress</string>
     <string name="search_projects_hint">Search projects</string>
-    <string name="search_users_hint">Search users</string>
+    <string name="add_users_hint">Add users to project</string>
 
     <string-array name="image_quality_array">
         <item>Full (original size)</item>

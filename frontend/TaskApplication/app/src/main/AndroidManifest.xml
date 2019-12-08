@@ -14,16 +14,18 @@
         <activity android:name=".CreateTaskActivity"
             android:label="Create task"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ProjectActivity"
-            android:label="Project"
-            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".ProjectActivity"
+                  android:label="Project"
+                  android:theme="@style/AppTheme.NoActionBar">
+            <meta-data android:name="android.app.default_searchable"
+                       android:value=".SearchableActivity" />
+        </activity>
         <activity android:name=".SearchableActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
             <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
+                       android:resource="@xml/searchable" />
         </activity>
         <activity
             android:name=".CreateProjectActivity"
