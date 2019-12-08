@@ -44,9 +44,11 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
                 Log.d(TAG, "getItemAtPosition ${parent.getItemAtPosition(position)}")
                 val pid = customAdapter.getItem(position)!!.getValue("pid")
                 val name = customAdapter.getItem(position)!!.getValue("name")
+                val type = customAdapter.getItem(position)!!.getValue("type")
                 val intent = Intent(this, ProjectActivity::class.java)
                 intent.putExtra("pid", pid)
                 intent.putExtra("name", name)
+                intent.putExtra("type", type)
                 startActivity(intent)
             }
         // Initialize Firebase instances.
@@ -98,10 +100,12 @@ class ProjectsActivity : BaseActivity(), View.OnClickListener  {
         val pid = projects.key.toString()
         val name = projects.child("name").value.toString()
         val modified = projects.child("modified").value.toString()
+        val type = projects.child("type").value.toString()
         val projectMap = mapOf(
             "pid" to pid,
             "name" to name,
-            "modified" to modified)
+            "modified" to modified,
+            "type" to type)
 
         Log.d(TAG, "pid: $pid name: $name modified: $modified")
 

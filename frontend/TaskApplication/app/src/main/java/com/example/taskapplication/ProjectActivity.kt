@@ -35,9 +35,10 @@ class ProjectActivity : BaseActivity(),
     private lateinit var auth: FirebaseAuth
     // Declare an instance of Firebase Realtime Database.
     private lateinit var database: DatabaseReference
-    // Keep track of the project ID and name for this task.
+    // Keep track of the project.
     lateinit var projectId: String
     lateinit var projectName: String
+    lateinit var projectType: String
     // Declare an instance of ListView to display the list of tasks.
     private lateinit var tasksListView: ListView
     private lateinit var taskAdapter: TasksCustomAdapter
@@ -114,8 +115,8 @@ class ProjectActivity : BaseActivity(),
 
     // Displays icons on the app/action bar.
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        // Inflate the options menu from XML.
-        menuInflater.inflate(R.menu.project_view_menu, menu)
+        // Inflate the options menu from XML if this is a group project.
+        if (projectType == "group") menuInflater.inflate(R.menu.project_view_menu, menu)
         return true
     }
 
@@ -148,6 +149,7 @@ class ProjectActivity : BaseActivity(),
 
     private fun getProjectMemberNames(dataSnapshot: DataSnapshot) {
         val pm = arrayListOf<String>()
+        Log.d(TAG, "------------------ GET NAMES START dataSnapshot: $dataSnapshot")
         dataSnapshot.children.forEach {
             val uid = it.value.toString()
             pm.add(uid)
@@ -329,6 +331,11 @@ class ProjectActivity : BaseActivity(),
                     }
                 } else {
                     // A key-value pair was not found at the given database path.
+                    when (action) {
+                        "getProjectMemberNames" -> Toast.makeText(applicationContext,
+                            "You are the only member of this project.",
+                            Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
             override fun onCancelled(databaseError: DatabaseError) {
@@ -349,6 +356,7 @@ class ProjectActivity : BaseActivity(),
             // an extra from an Activity calling this activity.
             projectId = intent.extras?.getString("pid")!!
             projectName = intent.extras?.getString("name")!!
+            projectType = intent.extras?.getString("type")!!
             supportActionBar?.setTitle(projectName)
             val projectPath = database.child("projects").child(projectId)
             val tasksPath = projectPath.child("tasks")

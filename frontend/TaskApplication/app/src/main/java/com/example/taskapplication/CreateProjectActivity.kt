@@ -174,14 +174,6 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
                         ) {
                             // Called when response HTTP status is "200 OK".
                             Log.d(TAG, "createProject:APIClient:onSuccess")
-                            // Add the received project ID to this user's projects.
-                            /*val pid = response.getString("project_id")
-                            database.child("users")
-                                .child(auth.uid!!)
-                                .child("projects")
-                                .child(pid)
-                                .setValue("")
-                                .addOnSuccessListener { successRedirect() }*/
                             successRedirect()
                         }
                         override fun onFailure(
