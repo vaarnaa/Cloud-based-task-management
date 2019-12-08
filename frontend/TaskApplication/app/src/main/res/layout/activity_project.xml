@@ -42,6 +42,7 @@
                 android:id="@+id/projectTasksView"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:visibility="visible"
                 android:footerDividersEnabled="false" />
 
             <GridView
@@ -51,12 +52,14 @@
                 android:columnWidth="150dp"
                 android:horizontalSpacing="10dp"
                 android:numColumns="auto_fit"
+                android:visibility="gone"
                 android:verticalSpacing="10dp" />
 
             <ListView
                 android:id="@+id/projectFilesView"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:footerDividersEnabled="false" />
 
         </LinearLayout>

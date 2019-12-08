@@ -25,7 +25,7 @@ const projectBody = Joi.object({
     description: Joi.string().required(),
     deadline: Joi.date().optional(),
     badge: Joi.string().optional(),
-    keywords: Joi.array().items(Joi.string()).max(3).optional()
+    keywords: Joi.array().items(Joi.string().allow('')).max(3).optional()
 })
 
 const taskAttributesBody = Joi.object({

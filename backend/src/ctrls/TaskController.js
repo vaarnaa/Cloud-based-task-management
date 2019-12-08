@@ -9,6 +9,7 @@ const {
     notBelongsToProject,
     PROJECT_ROOT,
     setModifiedToNow,
+    taskExists,
 } = require('../refs')
 const { invalidInput } = require('../errors')
 const log = require('../log')
@@ -49,7 +50,9 @@ const TaskController = {
             return res.status(404).json({ code: 404, message: 'Project not found'})
         }
 
-        if (req.auth_user.id !== project.admin && !project.members.find(member => member === req.auth_user.id)) {
+        const members = (project.members && Object.keys(project.members)) || []
+
+        if (req.auth_user.id !== project.admin && !members.find(member => member === req.auth_user.id)) {
             return res.status(403).json({ code: 403, message: 'Forbidden operation '})
         }
 
@@ -85,9 +88,10 @@ const TaskController = {
 
         // TODO: project not found? or just get rid of the 404 altogether from everywhere?
 
-        const { admin, type } = await getProject(req.params.project_id)
+        const { admin, type } = await getProject(req.params.project_id) || { }
 
-        if (admin !== req.auth_user.id || type !== 'group') {
+        if (admin !== req.auth_user.id || type !== 'group' ||
+            !(await taskExists(req.params.project_id, req.params.task_id))) {
             return res.status(403).json({
                 code: 403, message: 'Forbidden operation'
             })
@@ -95,7 +99,13 @@ const TaskController = {
 
         const taskRef = `${PROJECT_ROOT}/${req.params.project_id}/tasks/${req.params.task_id}`
         const data = await database.ref(`${taskRef}/assignments`).set(
-            value.assignments.map(assignment => assignment.id)
+            value.assignments.reduce(
+                (updates, assignment) => {
+                    updates[`${assignment.id}`] = ''
+                    return updates
+                },
+                { },
+            )
         )
 
         await Promise.all([
@@ -120,7 +130,8 @@ const TaskController = {
 
         // TODO: project not found? or just get rid of the 404 altogether from everywhere?
 
-        if (await notBelongsToProject(req.auth_user.id, req.params.project_id)) {
+        if (await notBelongsToProject(req.auth_user.id, req.params.project_id) ||
+            !(await taskExists(req.params.project_id, req.params.task_id))) {
             return res.status(403).json({ code: 403, message: 'Forbidden operation' })
         }
 
