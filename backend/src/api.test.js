@@ -7,7 +7,8 @@ const util = require('util')
 const app = require('./app')
 const {database} = require('./db')
 
-afterAll(() => database.goOffline())
+// This is not enough to shutdown Firebase (avoiding handle stuck after tests)
+//afterAll(() => database.goOffline())
 
 describe('Web server', () => {
     it('Front page', async () => {
@@ -21,7 +22,9 @@ const default_headers = {
         'eyJpc3N1ZXIiOiJUT0tFTl9JU1NVRVIiLCJpZCI6Ikl3M0JtS2V6cjVoRWw5QUFIM2RkVm1IQWxzOTIiLCJlbWFpbCI6InRlbXBAZXhhbXBsZS5sb2NhbCJ9'
 }
 
-describe('ProjectController', () => {
+const describe_db = (process.env.GOOGLE_APPLICATION_CREDENTIALS ? describe : describe.skip)
+
+describe_db('ProjectController', () => {
     let res, project_id
     it('Create new project', async () => {
         res = await request(app)

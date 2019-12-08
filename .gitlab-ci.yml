@@ -12,7 +12,7 @@ eslint:
     - npm run lint
 
 jest:
-  stage: second
+  stage: first
   script:
     - cd backend
     - npm install
