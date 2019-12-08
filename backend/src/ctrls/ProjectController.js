@@ -96,7 +96,7 @@ const ProjectController = {
         await Promise.all(members.concat(admin).map(member =>
             database.ref(`${USER_ROOT}/${member}/projects/${req.params.project_id}`).remove()
         ))
-        res.status(200).json(data)
+        res.status(200).json({ data })
     },
 
     /*
