@@ -100,7 +100,7 @@ class CreateProjectActivity : BaseActivity(), View.OnClickListener {
             val input = et_project_keywords.text.toString()
             val regex = """^[a-zA-Z0-9\s]+$""".toRegex()
 
-            if (!input.matches(regex)) {
+            if (input.trim().isNotEmpty() && !input.matches(regex)) {
                 Toast.makeText(this,
                     "Only alphanumeric characters allowed in keywords. Use space as delimiter.",
                     Toast.LENGTH_LONG).show()
