@@ -34,7 +34,7 @@ class ProjectActivity : BaseActivity(),
     lateinit var projectId: String
     lateinit var projectName: String
     // Declare an instance of ListView to display the list of tasks.
-    private lateinit var listView: ListView
+    private lateinit var tasksListView: ListView
     private lateinit var taskAdapter: TasksCustomAdapter
     private val taskEntries = arrayListOf<Map<String, String>>()
     private var updatingTaskList = false
@@ -57,10 +57,10 @@ class ProjectActivity : BaseActivity(),
         // Handle clicks in `onClick`.
         fab_project.setOnClickListener(this)
         // Initialize the task list and the adapter used to populate it.
-        listView = projectTasksView
+        tasksListView = projectTasksView
         taskAdapter = TasksCustomAdapter(applicationContext, taskEntries)
-        listView.adapter = taskAdapter
-        listView.onItemClickListener =
+        tasksListView.adapter = taskAdapter
+        tasksListView.onItemClickListener =
             AdapterView.OnItemClickListener { parent, _, position, _ ->
                 // Update the status of a clicked task using our API.
                 Log.d(TAG, "position $position")
@@ -120,20 +120,23 @@ class ProjectActivity : BaseActivity(),
             R.id.navigation_tasks -> {
                 currentPage = PageType.TASKS
                 Toast.makeText(this, "Tasks clicked", Toast.LENGTH_SHORT).show()
-                val tasksFragment = TasksFragment.newInstance()
-                openFragment(tasksFragment)
+                tasksListView.visibility = View.VISIBLE
+                //val tasksFragment = TasksFragment.newInstance()
+                //openFragment(tasksFragment)
             }
             R.id.navigation_pictures -> {
                 currentPage = PageType.IMAGES
                 Toast.makeText(this, "Pictures clicked", Toast.LENGTH_SHORT).show()
-                val picturesFragment = PicturesFragment.newInstance()
-                openFragment(picturesFragment)
+                tasksListView.visibility = View.GONE
+                //val picturesFragment = PicturesFragment.newInstance()
+                //openFragment(picturesFragment)
             }
             R.id.navigation_files -> {
                 currentPage = PageType.FILES
                 Toast.makeText(this,"Files clicked", Toast.LENGTH_SHORT).show()
-                val filesFragment = FilesFragment.newInstance()
-                openFragment(filesFragment)
+                tasksListView.visibility = View.GONE
+                //val filesFragment = FilesFragment.newInstance()
+                //openFragment(filesFragment)
             }
             else -> {
                 return@OnNavigationItemSelectedListener false
@@ -149,7 +152,7 @@ class ProjectActivity : BaseActivity(),
         transaction.commit()
     }
 
-    fun updateTask(tid: String, status: String) {
+    private fun updateTask(tid: String, status: String) {
         showProgressDialog()
         // Update the status of the given task with our API.
         val user = auth.currentUser

@@ -128,10 +128,13 @@ class CreateTaskActivity : BaseActivity(), View.OnClickListener {
 
     private fun successRedirect() {
         // Redirect to ProjectActivity upon success.
+        finish()
+        /*
         val intent = Intent(this, ProjectActivity::class.java)
         intent.putExtra("pid", projectId)
         intent.putExtra("name", projectName)
         startActivity(intent)
+        */
     }
 
     private fun pickDeadline() {

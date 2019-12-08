@@ -43,6 +43,18 @@
                 android:layout_height="wrap_content"
                 android:footerDividersEnabled="false" />
 
+            <ListView
+                android:id="@+id/projectPicturesView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:footerDividersEnabled="false" />
+
+            <ListView
+                android:id="@+id/projectImagesView"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:footerDividersEnabled="false" />
+
         </LinearLayout>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
