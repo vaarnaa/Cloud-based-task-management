@@ -104,8 +104,15 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                 val pid = intent.getStringExtra("pid")
                 if (pid != null)
                 {
-                    val storage_ref = storage.reference
-                        .child("project_files/$pid/${selectedFile.name}")
+                    var storage_ref = storage.reference.child("project_files/$pid")
+
+                    // Upload to different subfolders; these will be shown in different tabs
+                    if (intent.getStringExtra("type") == "image") {
+                        storage_ref = storage_ref.child("images/${selectedFile.name}")
+                    }
+                    else {
+                        storage_ref = storage_ref.child("files/${selectedFile.name}")
+                    }
 
                     Log.d(TAG, "storage ref: ${selectedFile.name}")
                     Log.d(TAG, "storage ref: $storage_ref")

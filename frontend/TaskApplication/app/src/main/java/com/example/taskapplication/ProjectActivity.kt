@@ -19,6 +19,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.loopj.android.http.JsonHttpResponseHandler
 import cz.msebera.android.httpclient.Header
 import cz.msebera.android.httpclient.entity.ContentType
@@ -31,24 +33,42 @@ class ProjectActivity : BaseActivity(),
     TasksFragment.OnFragmentInteractionListener,
     PicturesFragment.OnFragmentInteractionListener,
     FilesFragment.OnFragmentInteractionListener{
-    // Declare an instance of Firebase Auth.
+
+    // Declare Firebase instances
     private lateinit var auth: FirebaseAuth
-    // Declare an instance of Firebase Realtime Database.
     private lateinit var database: DatabaseReference
+    private lateinit var storage: FirebaseStorage
+
     // Keep track of the project.
     lateinit var projectId: String
     lateinit var projectName: String
     lateinit var projectType: String
+
     // Declare an instance of ListView to display the list of tasks.
     private lateinit var tasksListView: ListView
     private lateinit var taskAdapter: TasksCustomAdapter
     private val taskEntries = arrayListOf<Map<String, String>>()
     private var updatingTaskList = false
+
+    // Declare an instance of ListView to display the list of tasks.
+    private lateinit var imagesListView: ListView
+    private lateinit var imagesAdapter: ImagesCustomAdapter
+    private val imageEntries = arrayListOf<Map<String, String>>()
+    private var updatingImageList = false
+
+    // Declare an instance of ListView to display the list of tasks.
+    private lateinit var filesListView: ListView
+    private lateinit var filesAdapter: FilesCustomAdapter
+    private val filesEntries = arrayListOf<Map<String, String>>()
+    private var updatingFileList = false
+
+
     // Keep track of all user IDs and usernames to enable searching for new project members.
     private val userIds = ArrayList<String>()
     private val usernames = ArrayList<String>()
     private lateinit var projectMembers: ArrayList<String>
 
+    // Defines the page which is now shown to the user
     enum class PageType {
         TASKS,
         IMAGES,
@@ -63,14 +83,47 @@ class ProjectActivity : BaseActivity(),
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
+
         // Handle clicks in `onClick`.
         fab_project.setOnClickListener(this)
+
         // Initialize the task list and the adapter used to populate it.
-        tasksListView = projectTasksView
         taskAdapter = TasksCustomAdapter(applicationContext, taskEntries)
+        tasksListView = projectTasksView
         tasksListView.adapter = taskAdapter
-        tasksListView.onItemClickListener =
-            AdapterView.OnItemClickListener { parent, _, position, _ ->
+        tasksListView.onItemClickListener = itemClickHandler("tasks")
+
+        // Initialize the image list and the adapter used to populate it.
+        imagesAdapter = ImagesCustomAdapter(applicationContext, imageEntries)
+        imagesListView = projectPicturesView
+        imagesListView.adapter = imagesAdapter
+        imagesListView.onItemClickListener = itemClickHandler("images")
+
+        // Initialize the file list and the adapter used to populate it.
+        filesAdapter = FilesCustomAdapter(applicationContext, filesEntries)
+        filesListView = projectFilesView
+        filesListView.adapter = filesAdapter
+        filesListView.onItemClickListener = itemClickHandler("files")
+
+        // Initialize Firebase instances.
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
+        storage = FirebaseStorage.getInstance()
+
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+
+        // Set default fragment and place in layout
+        if (savedInstanceState == null) {
+            val firstFragment = TasksFragment()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_place_holder, firstFragment).commit()
+        }
+    }
+
+    private fun itemClickHandler (type: String): AdapterView.OnItemClickListener {
+        when (type) {
+            "tasks" -> return AdapterView.OnItemClickListener { parent, _, position, _ ->
                 // Update the status of a clicked task using our API.
                 Log.d(TAG, "position $position")
                 Log.d(TAG, "getItemAtPosition ${parent.getItemAtPosition(position)}")
@@ -86,18 +139,9 @@ class ProjectActivity : BaseActivity(),
                 }
                 updateTask(id, st)
             }
-
-        // Initialize Firebase instances.
-        auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance().reference
-        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-
-        // Set default fragment and place in layout
-        if (savedInstanceState == null) {
-            val firstFragment = TasksFragment()
-            supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_place_holder, firstFragment).commit()
+            "images" -> return AdapterView.OnItemClickListener { parent, _, position, _ -> {}}
+            "files" -> return AdapterView.OnItemClickListener { parent, _, position, _ -> {}}
+            else -> { throw Exception("no listener for such type") }
         }
     }
 
@@ -204,24 +248,24 @@ class ProjectActivity : BaseActivity(),
         when (item.itemId) {
             R.id.navigation_tasks -> {
                 currentPage = PageType.TASKS
-                Toast.makeText(this, "Tasks clicked", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Tasks clicked", Toast.LENGTH_SHORT).show()
                 tasksListView.visibility = View.VISIBLE
-                //val tasksFragment = TasksFragment.newInstance()
-                //openFragment(tasksFragment)
+                imagesListView.visibility = View.GONE
+                filesListView.visibility = View.GONE
             }
             R.id.navigation_pictures -> {
                 currentPage = PageType.IMAGES
-                Toast.makeText(this, "Pictures clicked", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Pictures clicked", Toast.LENGTH_SHORT).show()
                 tasksListView.visibility = View.GONE
-                //val picturesFragment = PicturesFragment.newInstance()
-                //openFragment(picturesFragment)
+                imagesListView.visibility = View.VISIBLE
+                filesListView.visibility = View.GONE
             }
             R.id.navigation_files -> {
                 currentPage = PageType.FILES
-                Toast.makeText(this,"Files clicked", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this,"Files clicked", Toast.LENGTH_SHORT).show()
                 tasksListView.visibility = View.GONE
-                //val filesFragment = FilesFragment.newInstance()
-                //openFragment(filesFragment)
+                imagesListView.visibility = View.GONE
+                filesListView.visibility = View.VISIBLE
             }
             else -> {
                 return@OnNavigationItemSelectedListener false
@@ -369,11 +413,89 @@ class ProjectActivity : BaseActivity(),
             // The user is signed in, so fetch all tasks here, sorted by creation date.
             // For each, display a checkbox next to it.
             readFromDatabase(tasksPath, "populateTaskList")
+            updateFilesFromStorage()
         } else {
             // The user is signed out, so redirect to the login page.
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun updateFilesFromStorage() {
+        val filesRef = storage.reference.child("project_files/$projectId/files")
+        val imagesRef = storage.reference.child("project_files/$projectId/images")
+
+        Log.d(TAG, "updating files from storage")
+
+        filesRef.listAll()
+            .addOnSuccessListener { taskSnapshot ->
+                Log.d(TAG, "filesref success, items: ${taskSnapshot.items}")
+
+                filesEntries.clear()
+                filesEntries.ensureCapacity(taskSnapshot.items.count())
+
+                taskSnapshot.items.forEach { it: StorageReference ->
+                    // NB, `it` contains only the paths, nothing else, so we need to retrieve urls
+                    it.downloadUrl
+                        .addOnSuccessListener { jt: Uri ->
+
+                            // busy-wait mutex
+                            while (updatingFileList) { }
+                            updatingFileList = true
+
+                            filesEntries.add(mapOf(
+                                "name" to it.name,
+                                "downloadURL" to jt.toString()
+                            ))
+
+                            updatingFileList = false
+                            imagesAdapter.notifyDataSetChanged()
+
+                            Log.d(TAG, "filesEntries:${filesEntries.toTypedArray().contentToString()}")
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e(TAG, "filesRef single exception: $exception")
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "filesref exception: $exception")
+            }
+
+        imagesRef.listAll()
+            .addOnSuccessListener { taskSnapshot ->
+                Log.d(TAG, "imagesRef success, items: ${taskSnapshot.items}")
+
+                imageEntries.clear()
+                imageEntries.ensureCapacity(taskSnapshot.items.count())
+
+                taskSnapshot.items.forEach { it: StorageReference ->
+                    // NB, `it` contains only the paths, nothing else, so we need to retrieve urls
+                    it.downloadUrl
+                        .addOnSuccessListener { jt: Uri ->
+
+                            // busy-wait mutex
+                            while (updatingImageList) { }
+                            updatingImageList = true
+
+                            imageEntries.add(mapOf(
+                                "name" to it.name,
+                                "downloadURL" to jt.toString()
+                            ))
+
+                            updatingImageList = false
+                            imagesAdapter.notifyDataSetChanged()
+
+                            Log.d(TAG, "imageEntries:${imageEntries.toTypedArray().contentToString()}")
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e(TAG, "imagesRef single exception: $exception")
+                        }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.e(TAG, "imagesRef exception: $exception")
+            }
     }
 
     override fun onClick(v: View) {
@@ -389,17 +511,15 @@ class ProjectActivity : BaseActivity(),
                     PageType.FILES -> {
                         val intent = Intent(this, UploadFileActivity::class.java)
                         intent.putExtra("pid", projectId)
-                        intent.putExtra("type", "file")
-                        intent.putExtra("pid", projectId)
                         intent.putExtra("name", projectName)
+                        intent.putExtra("type", "file")
                         startActivity(intent)
                     }
                     PageType.IMAGES -> {
                         val intent = Intent(this, UploadFileActivity::class.java)
                         intent.putExtra("pid", projectId)
-                        intent.putExtra("type", "image")
-                        intent.putExtra("pid", projectId)
                         intent.putExtra("name", projectName)
+                        intent.putExtra("type", "image")
                         startActivity(intent)
                     }
                 }

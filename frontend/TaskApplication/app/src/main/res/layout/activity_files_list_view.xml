@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:gravity="start">
+
+        <Button
+            android:id="@+id/button_pick_file"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginHorizontal="10dp"
+            android:drawableLeft="@android:drawable/stat_sys_download"
+            android:drawableTint="@color/colorPrimaryDark"
+            />
+
+        <TextView
+            android:id="@+id/projectFileListView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_marginVertical="2dp"
+            tools:text="File list" />
+
+    </LinearLayout>
+
+</LinearLayout>
