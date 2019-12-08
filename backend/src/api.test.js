@@ -25,7 +25,7 @@ const default_headers = {
 const describe_db = (process.env.GOOGLE_APPLICATION_CREDENTIALS ? describe : describe.skip)
 
 describe_db('ProjectController', () => {
-    let res, project_id
+    let res, project_id, task_id
     it('Create new project', async () => {
         res = await request(app)
             .post('/project')
@@ -40,7 +40,6 @@ describe_db('ProjectController', () => {
         expect(res.body).toHaveProperty('project_id')
         project_id = res.body.project_id
     })
-
     it.skip('Get project attachments', async () => {
         res = await request(app)
             .get(`/project/${project_id}/attachments`)
@@ -76,7 +75,6 @@ describe_db('ProjectController', () => {
             .send()
         expect(res.statusCode).toEqual(200)
     })
-
     it('Delete project', async () => {
         res = await request(app)
             .delete(`/project/${project_id}`)
@@ -90,4 +88,68 @@ describe_db('ProjectController', () => {
         }
         res = undefined
     })
+})
+
+describe_db("TaskController", () => {
+    let res, project_id, task_id
+    it('Create new project', async () => {
+        res = await request(app)
+            .post('/project')
+            .set(default_headers)
+            .send({
+                name: 'project_for_task_testing',
+                description: 'desc',
+                type: 'personal',
+                deadline: 'Wed, 14 Jun 2020 07:00:00 GMT',
+            })
+        expect(res.statusCode).toEqual(201)
+        expect(res.body).toHaveProperty('project_id')
+        project_id = res.body.project_id
+    })
+    it('Create new task', async () => {
+        res = await request(app)
+            .post(`/project/${project_id}/task`)
+            .set(default_headers)
+            .send({
+                description: 'test task',
+                status: 'pending',
+                deadline: 'Wed, 14 Jun 2020 07:00:00 GMT',
+            })
+        expect(res.statusCode).toEqual(201)
+        expect(res.body).toHaveProperty('task_id')
+        task_id = res.body.task_id
+    })
+    it('Update task', async () => {
+        res = await request(app)
+            .put(`/project/${project_id}/task/${task_id}/status`)
+            .set(default_headers)
+            .send({
+                status: 'completed',
+            })
+        expect(res.statusCode).toEqual(200)
+        expect(res.body.status).toEqual('completed')
+    })
+    it.skip('Assign task', async () => {   // This test gets "FORBIDDEN OPERATION"
+        res = await request(app)
+            .put(`/project/${project_id}/task/${task_id}/assignments`)
+            .set(default_headers)
+            .send({
+                assignments: [],
+            })
+        expect(res.statusCode).toEqual(200)
+    })
+    it.skip('Delete task', async () => {  // Not implemented on app.js
+        res = await request(app)
+            .delete(`/project/${project_id}/task/${task_id}`)
+            .set(default_headers)
+            .send()
+        expect(res.statusCode).toEqual(200)
+    })
+    afterEach(() => {
+        if (res && res.body && res.body.message) {
+            console.log(util.inspect(res.body.message, { depth: 10 }))
+        }
+        res = undefined
+    })
+
 })
