@@ -15,4 +15,9 @@
         app:showAsAction="never"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
+    <item
+        android:id="@+id/action_delete_project"
+        android:title="@string/delete_project"
+        app:showAsAction="never"/>
+
 </menu>
