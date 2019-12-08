@@ -5,9 +5,9 @@
 const request = require('supertest')
 const util = require('util')
 const app = require('./app')
-const {database} = require('./db')
 
 // This is not enough to shutdown Firebase (avoiding handle stuck after tests)
+//const { database } = require('./db')
 //afterAll(() => database.goOffline())
 
 describe('Web server', () => {
