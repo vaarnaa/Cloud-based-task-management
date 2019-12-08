@@ -133,7 +133,10 @@ class UploadFileActivity : BaseActivity(), View.OnClickListener{
                             progressStatus.text = "Upload successful!\n" +
                                     "Path: ${taskSnapshot.metadata!!.path}\n" +
                                     "Uploaded size: ${taskSnapshot.metadata!!.sizeBytes / 1000} KB"
-                            successRedirect()
+
+                            // TODO: do not redirect automatically, there is a back button and the
+                            // user gets to see the output (success/fail)
+                            // successRedirect()
                         }
                         .addOnFailureListener { exception ->
                             progressStatus.text = "Upload failed: $exception"

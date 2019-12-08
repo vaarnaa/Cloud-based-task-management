@@ -1,3 +1,4 @@
+backend/coverage
 backend/node_modules
 backend/secrets/*.json
 infra/firebase/token.txt
