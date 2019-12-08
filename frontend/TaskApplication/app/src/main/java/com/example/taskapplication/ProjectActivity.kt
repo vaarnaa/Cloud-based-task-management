@@ -243,6 +243,7 @@ class ProjectActivity : BaseActivity(),
                             // Redirect to the project list page after successful deletion.
                             val intent = Intent(applicationContext, ProjectsActivity::class.java)
                             startActivity(intent)
+                            finish()
 
                         }
                         override fun onFailure(
